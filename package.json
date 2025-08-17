@@ -1,0 +1,27 @@
+{
+  "name": "playermarket",
+  "version": "1.0.0",
+  "description": "Player Market is a tool that will hopefully be used by esports coaches and staff to scout upcoming talented players from Ranked.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imasepan/PlayerMarket.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imasepan/PlayerMarket/issues"
+  },
+  "homepage": "https://github.com/imasepan/PlayerMarket#readme",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "playwright": "^1.54.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0"
+  }
+}

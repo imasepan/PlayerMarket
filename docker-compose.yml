@@ -1,0 +1,10 @@
+services:
+  playermarket:
+    container_name : playermarket-api
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+
