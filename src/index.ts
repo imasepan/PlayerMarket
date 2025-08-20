@@ -66,26 +66,26 @@ const platformInfo = profileData.data.platformInfo;
 //     console.log(`${platformInfo.platformUserHandle} had ${totalKills} total kills`);
 // });
 
-// 1️⃣ Process current season segments
-profileData?.data?.segments?.forEach(segment => {
-    if (segment.type !== "season") return;
+// Process current season segments
+// profileData?.data?.segments?.forEach(segment => {
+//     if (segment.type !== "season") return;
 
-    const metadata = segment.metadata;
-    const seasonName = metadata.name;
-    const playlistName = metadata.playlistName;
-    const stats = segment.stats;
+//     const metadata = segment.metadata;
+//     const seasonName = metadata.name;
+//     const playlistName = metadata.playlistName;
+//     const stats = segment.stats;
 
-    const attackKills = stats.attackKills?.value ?? 0;
-    const defenseKills = stats.defenseKills?.value ?? 0;
-    const totalKills = stats.kills?.value ?? 0;
+//     const attackKills = stats.attackKills?.value ?? 0;
+//     const defenseKills = stats.defenseKills?.value ?? 0;
+//     const totalKills = stats.kills?.value ?? 0;
 
-    console.log(`\n=== ${seasonName} (${playlistName}) ===`);
-    console.log(`${platformInfo.platformUserHandle} had ${attackKills} attack kills`);
-    console.log(`${platformInfo.platformUserHandle} had ${defenseKills} defense kills`);
-    console.log(`${platformInfo.platformUserHandle} had ${totalKills} total kills`);
-});
+//     console.log(`\n=== ${seasonName} (${playlistName}) ===`);
+//     console.log(`${platformInfo.platformUserHandle} had ${attackKills} attack kills`);
+//     console.log(`${platformInfo.platformUserHandle} had ${defenseKills} defense kills`);
+//     console.log(`${platformInfo.platformUserHandle} had ${totalKills} total kills`);
+// });
 
-// 2️⃣ Process past seasons dynamically
+// Process past seasons dynamically
 const lastSixSeasons = profileData.data.metadata.seasons.slice(0, 6);
 
 for (const season of lastSixSeasons) {
