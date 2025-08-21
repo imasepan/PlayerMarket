@@ -687,7 +687,7 @@
             "displayValue": "0.6",
             "displayType": "NumberPrecision1"
           },
-          "headshotsPercentage": {
+          "sPercentageheadshot": {
             "percentile": 94.0,
             "displayName": "Headshot %",
             "displayCategory": "Combat",

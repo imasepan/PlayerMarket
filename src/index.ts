@@ -110,12 +110,30 @@ for (const season of lastSixSeasons) {
     }
 
     const stats = seasonSegment.stats;
-    const attackKills = stats.attackKills?.value ?? 0;
-    const defenseKills = stats.defenseKills?.value ?? 0;
+    const attackKillsPerRound = stats.attackKillsPerRound?.value ?? 0;
+    const defenseKillsPerRound = stats.defenseKillsPerRound?.value ?? 0;
     const totalKills = stats.kills?.value ?? 0;
+    const firstKills = stats.firstBloods?.value ?? 0;
+    const firstKillsPerRound = stats.firstBloodsPerRound?.value ?? 0;
+    const firstDeaths = stats.firstDeaths?.value ?? 0;
+    const firstDeathsPerRound = stats.firstDeathsPerRound?.value ?? 0;
+    const firstKillsToDeaths = firstDeaths > 0 ? firstKills / firstDeaths : firstKills;
+    const KPR = stats.killsPerRound?.value ?? 0;
+    const KAST = stats.KAST?.value ?? 0;
+    const headshotPercentage = stats.sPercentageheadshot?.value ?? 0;
+    const trackerScore = stats.trnPerformanceScore?.value ?? 0;
 
     console.log(`\n=== ${seasonName} ===`);
-    console.log(`${platformInfo.platformUserHandle} had ${attackKills} attack kills`);
-    console.log(`${platformInfo.platformUserHandle} had ${defenseKills} defense kills`);
     console.log(`${platformInfo.platformUserHandle} had ${totalKills} total kills`);
+    console.log(`${platformInfo.platformUserHandle} had ${attackKillsPerRound} attack kills`);
+    console.log(`${platformInfo.platformUserHandle} had ${defenseKillsPerRound} defense kills`);
+    console.log(`${platformInfo.platformUserHandle} had ${KPR} kills per round`);
+    console.log(`${platformInfo.platformUserHandle} had ${firstKills} first kills`);
+    console.log(`${platformInfo.platformUserHandle} had ${firstKillsPerRound} first kills per round`);
+    console.log(`${platformInfo.platformUserHandle} had ${firstDeathsPerRound} first deaths per round`);
+    console.log(`${platformInfo.platformUserHandle} had an FK/FD ratio of ${firstKillsToDeaths}`);
+    console.log(`${platformInfo.platformUserHandle} had a KAST of ${KAST}`);
+    if(headshotPercentage > 25)
+        console.log(`${platformInfo.platformUserHandle} had an above-average headshot percentage of ${headshotPercentage}`);
+    console.log(`${platformInfo.platformUserHandle} had a tracker score of ${trackerScore}`);
 }
