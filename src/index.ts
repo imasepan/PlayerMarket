@@ -113,14 +113,14 @@ for (const season of lastSixSeasons) {
     const attackKillsPerRound = stats.attackKillsPerRound?.value ?? 0;
     const defenseKillsPerRound = stats.defenseKillsPerRound?.value ?? 0;
     const totalKills = stats.kills?.value ?? 0;
-    const firstKills = stats.firstBloods?.value ?? 0;
-    const firstKillsPerRound = stats.firstBloodsPerRound?.value ?? 0;
-    const firstDeaths = stats.firstDeaths?.value ?? 0;
-    const firstDeathsPerRound = stats.firstDeathsPerRound?.value ?? 0;
+    const firstKills = Number(stats.firstBloods?.value ?? 0);
+    const firstKillsPerRound = Number(stats.firstBloodsPerRound?.value ?? 0);
+    const firstDeaths = Number(stats.firstDeaths?.value ?? 0);
+    const firstDeathsPerRound = Number(stats.firstDeathsPerRound?.value ?? 0);
     const firstKillsToDeaths = firstDeaths > 0 ? firstKills / firstDeaths : firstKills;
     const KPR = stats.killsPerRound?.value ?? 0;
     const KAST = stats.KAST?.value ?? 0;
-    const headshotPercentage = stats.sPercentageheadshot?.value ?? 0;
+    const headshotPercentage = Number(stats.sPercentageheadshot?.value ?? 0);
     const trackerScore = stats.trnPerformanceScore?.value ?? 0;
 
     console.log(`\n=== ${seasonName} ===`);
