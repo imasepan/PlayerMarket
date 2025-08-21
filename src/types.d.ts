@@ -1,3 +1,8 @@
+/*
+TODO Let's create dedicated interface/class files or something later Depending on if we
+TODO go functional or oop
+ */
+
 interface ApiResponse {
   data: {
     platformInfo: PlatformInfo;

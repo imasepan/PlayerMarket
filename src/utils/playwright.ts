@@ -1,6 +1,8 @@
 import {type Browser, chromium, devices} from "playwright";
 import {HttpStatusCode} from "axios";
 
+// TODO You're perfect - but actually modify behavior to be in-line with needs of application
+
 export class Playwright {
     private static browser: Browser | null = null;
 

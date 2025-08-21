@@ -1,6 +1,6 @@
 import { getEnv } from "./utils/env";
 import { Playwright } from "./utils/playwright";
-
+// TODO remove this example code and initialize an express listener
 
 console.log("hello world!");
 const username = "washed up player#bored";
