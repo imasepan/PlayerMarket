@@ -1,0 +1,118 @@
+import {PlaywrightService} from "./playwright.service.ts";
+
+interface TrackerResponse<T> {
+    data: T;
+}
+
+interface Playlist {
+    value: string;
+    label: string;
+    platform: string;
+    hasInsightData: boolean;
+}
+
+interface Season {
+    id: string;
+    name: string;
+    shortName: string;
+    startTime: string;
+    endTime: string;
+}
+
+interface Episode extends Season{
+    seasons: Season[];
+}
+
+interface PlatformInfo {
+    platformSlug: string;
+    platformUserId: string;
+    platformUserHandle: string;
+    platformUserIdentifier: string;
+    avatarUrl: string;
+    additionalParameters: unknown;
+}
+
+interface Badge {
+    titleSlug: string;
+    userId: number;
+    key: string;
+    lootKey: unknown;
+    tier: number;
+    name: string;
+    description: string;
+    isGlobal: boolean;
+    isStatTracker: boolean;
+    badgeImageUrl: string;
+    awardImageUrl: string;
+    rarity: string;
+    category: string;
+    nextMilestone: string;
+    dateAwarded: string;
+    awarderId: unknown;
+    seen: boolean;
+}
+
+interface UserInfo {
+    userId: number;
+    isPremium: boolean;
+    isVerified: boolean;
+    isInfluencer: boolean;
+    isPartner: boolean;
+    countryCode: string;
+    customAvatarUrl: string | null;
+    customHeroUrl: string | null;
+    customAvatarFrame: unknown;
+    customAvatarFrameInfo: unknown;
+    premiumDuration: unknown;
+    socialAccounts: unknown[];
+    badges: Badge[];
+    pageviews: number;
+    xpTier: number;
+    isSuspicious: unknown;
+}
+
+interface ProfileMetadata {
+    activeShard: string;
+    schema: string;
+    privacy: string;
+    defaultPlatform: string;
+    defaultPlaylist: string;
+    defaultSeason: string;
+    premierRosterId: string | null;
+    premierCrests: unknown;
+    accountLevel: number;
+    seasons: Season[];
+    playlists: Playlist[];
+}
+
+interface ProfileSegmentAttributes {
+    seasonId: string;
+    playlist: string;
+}
+
+interface ProfileSegment {
+    type: string;
+    attributes: ProfileSegmentAttributes;
+    metadata: unknown;
+    expiryDate: string;
+    stats: unknown;
+}
+
+export class TrackerService {
+    private readonly playwright = new PlaywrightService();
+
+    public async getPlaylists() {
+        const response =  await this.playwright.fetch<TrackerResponse<Playlist[]>>("");
+        return response.data;
+    }
+
+    public async getEpisodes() {
+        const response = await this.playwright.fetch<TrackerResponse<Episode[]>>("");
+        return response.data;
+    }
+
+    public async getSeasons() {
+        const episodes = await this.getEpisodes();
+        return episodes.flatMap(episode => episode.seasons);
+    }
+}

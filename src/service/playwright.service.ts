@@ -3,7 +3,7 @@ import {HttpStatusCode} from "axios";
 
 // TODO You're perfect - but actually modify behavior to be in-line with needs of application
 
-export class Playwright {
+export class PlaywrightService {
     private static browser: Browser | null = null;
 
     private static async getBrowser() {
@@ -13,9 +13,15 @@ export class Playwright {
         return this.browser;
     }
 
-    public static async fetch<T>(apiUrl: string): Promise<T | null> {
+    public static async close() {
+        if (this.browser != null) {
+            await this.browser.close();
+        }
+    }
 
-        const browser = await Playwright.getBrowser();
+    public async fetch<T>(apiUrl: string): Promise<T> {
+
+        const browser = await PlaywrightService.getBrowser();
         const context = await browser.newContext(devices['Desktop Chrome']);
         const page = await context.newPage();
         const response = await page.goto(apiUrl, { waitUntil: "networkidle" });
@@ -23,29 +29,17 @@ export class Playwright {
         if (!response) {
             console.log("No Response");
             await context.close();
-            return null;
+            throw new Error();
         }
 
-        if (response.status() == HttpStatusCode.UnavailableForLegalReasons) {
-            // Private profile
+        if (response.status() >= HttpStatusCode.BadRequest) {
+            console.log("400+ Error PlaywrightService", await response.text());
             await context.close();
-            return {} as T;
-        }
-
-        if (response.status() >= 400) {
-            console.log("400+ Error Playwright", await response.text());
-            await context.close();
-            return null;
+            throw new Error();
         }
 
         const data = (await response.json()) as T;
         await context.close();
         return data;
-    }
-
-    public static async close() {
-        if (this.browser != null) {
-            await this.browser.close();
-        }
     }
 }
