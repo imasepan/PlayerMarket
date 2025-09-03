@@ -12,10 +12,6 @@ interface baseApiResponse {
   };
 }
 
-interface SeasonApiResponse {
-  data: SeasonData[];
-}
-
 interface PlatformInfo {
   platformSlug: string;
   platformUserId: string;
@@ -116,7 +112,7 @@ interface SeasonMetadata {
   shortName: string;
   playlistName: string;
   startTime: string;  // ISO string
-  endTime: string;    // ISO string
+  endTime: string;    
   schema: string;
 }
 
@@ -130,7 +126,6 @@ interface SeasonData {
   };
 }
 
-// === Full API response ===
 interface SeasonApiResponse {
   data: SeasonData[];
 }
