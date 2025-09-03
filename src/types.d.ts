@@ -3,13 +3,17 @@ TODO Let's create dedicated interface/class files or something later Depending o
 TODO go functional or oop
  */
 
-interface ApiResponse {
+interface baseApiResponse {
   data: {
     platformInfo: PlatformInfo;
     userInfo: UserInfo;
     metadata: Metadata;
     segments: Segment[];
   };
+}
+
+interface SeasonApiResponse {
+  data: SeasonData[];
 }
 
 interface PlatformInfo {
@@ -87,4 +91,46 @@ interface Stat {
   displayType: string;
   percentile?: number;
   description?: string;
+}
+
+// charlie's additions
+
+interface Stat {
+  displayName: string;
+  displayCategory: string;
+  category: string;
+  metadata: Record<string, any>;
+  value: number;
+  displayValue: string;
+  displayType: string;
+  percentile?: number;
+}
+
+interface SeasonAttributes {
+  seasonId: string;
+  playlist: string;
+}
+
+interface SeasonMetadata {
+  name: string;
+  shortName: string;
+  playlistName: string;
+  startTime: string;  // ISO string
+  endTime: string;    // ISO string
+  schema: string;
+}
+
+interface SeasonData {
+  type: "season";
+  attributes: SeasonAttributes;
+  metadata: SeasonMetadata;
+  expiryDate: string; // ISO string
+  stats: {
+    [key: string]: Stat; // keys like matchesPlayed, roundsWon, etc.
+  };
+}
+
+// === Full API response ===
+interface SeasonApiResponse {
+  data: SeasonData[];
 }

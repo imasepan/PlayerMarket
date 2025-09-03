@@ -9,5 +9,5 @@ Express + Playwright + Mongo (maybe SQL of some sort instead)
 Everything. Design a schema and identify which routes are needed to fill tables.
 
 ### Commands
-docker compose -d --build // Starting
+docker compose up -d --build // Starting
 docker compose down // Stopping
