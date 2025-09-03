@@ -3,8 +3,8 @@ import { Playwright } from "./utils/playwright";
 // TODO remove this example code and initialize an express listener
 
 console.log("hello world!");
-// const username = "washed up player#bored";
-const username = "kash#psn";
+const username = "washed up player#bored";
+// const username = "kash#psn";
 const baseApiURL = getEnv("API_URL_PROFILE") + encodeURIComponent(username);
 //const seasonApiURL = getEnv("API_URL_PROFILE") + encodeURIComponent(username) + "/segments/season?playlist=competitive&seasonId=16118998-4705-5813-86dd-0292a2439d90&source=web";
 const profileData = await Playwright.fetch<baseApiResponse>(baseApiURL);
@@ -47,6 +47,7 @@ for (const season of lastSixSeasons) {
 
     const seasonEntry = seasonData.data[0]; // get the first season entry
     const stats = seasonEntry.stats;
+    const totalRounds = Number(stats.roundsPlayed?.value ?? 0);
     const attackKillsPerRound = Number(stats.attackKillsPerRound?.value ?? 0);
     const defenseKillsPerRound = Number(stats.defenseKillsPerRound?.value ?? 0);
     const totalKills = Number(stats.kills?.value ?? 0);
@@ -56,20 +57,23 @@ for (const season of lastSixSeasons) {
     const firstDeathsPerRound = Number(stats.firstDeathsPerRound?.value ?? 0);
     const firstKillsToDeaths = firstDeaths > 0 ? firstKills / firstDeaths : firstKills;
     const KPR = Number(stats.killsPerRound?.value ?? 0);
-    const KAST = Number(stats.KAST?.value ?? 0);
-    const headshotPercentage = Number(stats.sPercentageheadshot?.value ?? 0);
+    const KAST = (stats.kAST?.value ?? 0);
+    const headshotPercentage = Number(stats.headshotsPercentage?.value ?? 0);
     const trackerScore = Number(stats.trnPerformanceScore?.value ?? 0);
 
     console.log(`\n=== ${seasonName} ===`);
+    console.log(`${platformInfo.platformUserHandle} had ${totalRounds} total rounds`);
+    console.log(`of these rounds...`)
     console.log(`${platformInfo.platformUserHandle} had ${totalKills} total kills`);
     console.log(`${platformInfo.platformUserHandle} had ${attackKillsPerRound} attack kills`);
     console.log(`${platformInfo.platformUserHandle} had ${defenseKillsPerRound} defense kills`);
     console.log(`${platformInfo.platformUserHandle} had ${KPR} kills per round`);
     console.log(`${platformInfo.platformUserHandle} had ${firstKills} first kills`);
     console.log(`${platformInfo.platformUserHandle} had ${firstKillsPerRound} first kills per round`);
+    console.log(`${platformInfo.platformUserHandle} had ${firstDeaths} first deaths`);
     console.log(`${platformInfo.platformUserHandle} had ${firstDeathsPerRound} first deaths per round`);
     console.log(`${platformInfo.platformUserHandle} had an FK/FD ratio of ${firstKillsToDeaths}`);
-    console.log(`${platformInfo.platformUserHandle} had a KAST of ${KAST}`);
+    console.log(`${platformInfo.platformUserHandle} had a KAST of ${KAST}%`);
     if(headshotPercentage > 25)
         console.log(`${platformInfo.platformUserHandle} had an above-average headshot percentage of ${headshotPercentage}`);
     console.log(`${platformInfo.platformUserHandle} had a tracker score of ${trackerScore}`);
