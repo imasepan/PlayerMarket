@@ -45,38 +45,63 @@ for (const season of lastSixSeasons) {
         continue;
     }
 
-    const seasonEntry = seasonData.data[0]; // get the first season entry
-    const stats = seasonEntry.stats;
-    const totalRounds = Number(stats.roundsPlayed?.value ?? 0);
-    const attackKillsPerRound = Number(stats.attackKillsPerRound?.value ?? 0);
-    const defenseKillsPerRound = Number(stats.defenseKillsPerRound?.value ?? 0);
-    const totalKills = Number(stats.kills?.value ?? 0);
-    const firstKills = Number(stats.firstBloods?.value ?? 0);
-    const firstKillsPerRound = Number(stats.firstBloodsPerRound?.value ?? 0);
-    const firstDeaths = Number(stats.firstDeaths?.value ?? 0);
-    const firstDeathsPerRound = Number(stats.firstDeathsPerRound?.value ?? 0);
-    const firstKillsToDeaths = firstDeaths > 0 ? firstKills / firstDeaths : firstKills;
-    const KPR = Number(stats.killsPerRound?.value ?? 0);
-    const KAST = (stats.kAST?.value ?? 0);
-    const headshotPercentage = Number(stats.headshotsPercentage?.value ?? 0);
-    const trackerScore = Number(stats.trnPerformanceScore?.value ?? 0);
-
-    console.log(`\n=== ${seasonName} ===`);
-    console.log(`${platformInfo.platformUserHandle} had ${totalRounds} total rounds`);
-    console.log(`of these rounds...`)
-    console.log(`${platformInfo.platformUserHandle} had ${totalKills} total kills`);
-    console.log(`${platformInfo.platformUserHandle} had ${attackKillsPerRound} attack kills`);
-    console.log(`${platformInfo.platformUserHandle} had ${defenseKillsPerRound} defense kills`);
-    console.log(`${platformInfo.platformUserHandle} had ${KPR} kills per round`);
-    console.log(`${platformInfo.platformUserHandle} had ${firstKills} first kills`);
-    console.log(`${platformInfo.platformUserHandle} had ${firstKillsPerRound} first kills per round`);
-    console.log(`${platformInfo.platformUserHandle} had ${firstDeaths} first deaths`);
-    console.log(`${platformInfo.platformUserHandle} had ${firstDeathsPerRound} first deaths per round`);
-    console.log(`${platformInfo.platformUserHandle} had an FK/FD ratio of ${firstKillsToDeaths}`);
-    console.log(`${platformInfo.platformUserHandle} had a KAST of ${KAST}%`);
-    if(headshotPercentage > 25)
-        console.log(`${platformInfo.platformUserHandle} had an above-average headshot percentage of ${headshotPercentage}`);
-    console.log(`${platformInfo.platformUserHandle} had a tracker score of ${trackerScore}`);
+    // const seasonEntry = seasonData.data[0]; // get the first season entry
+    // const stats = seasonEntry.stats;
+    for (const entry of seasonData.data) {
+        if (entry.type === "season") {
+            const stats =entry.stats;
+            const totalRounds = (stats.roundsPlayed?.displayValue ?? 0);
+            const attackKillsPerRound = (stats.attackKillsPerRound?.displayValue ?? 0);
+            const defenseKillsPerRound = (stats.defenseKillsPerRound?.displayValue ?? 0);
+            const totalKills = (stats.kills?.value ?? 0);
+            const firstKills = Number(stats.firstBloods?.displayValue ?? 0);
+            const firstKillsPerRound = (stats.firstBloodsPerRound?.displayValue ?? 0);
+            const firstDeaths = Number(stats.firstDeaths?.displayValue ?? 0);
+            const firstDeathsPerRound = (stats.firstDeathsPerRound?.displayValue ?? 0);
+            const firstKillsToDeaths = firstDeaths > 0 ? firstKills / firstDeaths : firstKills;
+            const KDR = (stats.kDRatio?.displayValue ?? 0);
+            const KDA = (stats.kDARatio?.displayValue ?? 0);
+            const KPR = (stats.killsPerRound?.displayValue ?? 0);
+            const KAST = (stats.kAST?.displayValue ?? 0);
+            const headshotPercentage = Number(stats.headshotsPercentage?.displayValue ?? 0);
+            const trackerScore = (stats.trnPerformanceScore?.displayValue ?? 0);
+            console.log(`\n=== ${seasonName} ===`);
+            console.log(`${platformInfo.platformUserHandle} had ${totalRounds} total rounds`);
+            console.log(`of these rounds...`)
+            console.log(`${platformInfo.platformUserHandle} had a KD of ${KDR}`);
+            console.log(`${platformInfo.platformUserHandle} had a KDA of ${KDA}`);
+            console.log(`${platformInfo.platformUserHandle} had ${totalKills} total kills`);
+            console.log(`${platformInfo.platformUserHandle} had ${attackKillsPerRound} attack kills`);
+            console.log(`${platformInfo.platformUserHandle} had ${defenseKillsPerRound} defense kills`);
+            console.log(`${platformInfo.platformUserHandle} had ${KPR} kills per round`);
+            console.log(`${platformInfo.platformUserHandle} had ${firstKills} first kills`);
+            console.log(`${platformInfo.platformUserHandle} had ${firstKillsPerRound} first kills per round`);
+            console.log(`${platformInfo.platformUserHandle} had ${firstDeaths} first deaths`);
+            console.log(`${platformInfo.platformUserHandle} had ${firstDeathsPerRound} first deaths per round`);
+            console.log(`${platformInfo.platformUserHandle} had an FK/FD ratio of ${firstKillsToDeaths}`);
+            console.log(`${platformInfo.platformUserHandle} had a KAST of ${KAST}%`);
+            if(headshotPercentage > 25)
+                console.log(`${platformInfo.platformUserHandle} had an above-average headshot percentage of ${headshotPercentage}`);
+            console.log(`${platformInfo.platformUserHandle} had a tracker score of ${trackerScore}`);
+            }
+        if (entry.type === "agent") {
+            const agentName = entry.metadata.name;
+            const roundsPlayed = (entry.stats.roundsPlayed?.displayValue ?? 0);
+            const agentKPR = (entry.stats.killsPerRound?.displayValue ?? 0);
+            const agentFirstBloodsPR = (entry.stats.firstBloodsPerRound?.displayValue ?? 0);
+            const agentFirstDeathsPR = (entry.stats.firstDeathsPerRound?.displayValue ?? 0);
+            const agentKAST = (entry.stats.kAST?.displayValue ?? 0);
+            const clutchPercentage = (entry.stats.clutchesPercentage?.displayValue ?? 0);
+            const assistsPR = (entry.stats.assistsPerRound?.displayValue ?? 0);
+            console.log(`${platformInfo.platformUserHandle} played ${agentName} for ${roundsPlayed} rounds`);
+            console.log(`their ${agentName} had ${agentKPR} Kills Per Round`);
+            console.log(`their ${agentName} had ${agentFirstBloodsPR} first bloods per round`);
+            console.log(`their ${agentName} had ${agentFirstDeathsPR} first deaths per round`);
+            console.log(`their ${agentName} had a KAST of ${agentKAST}`);
+            console.log(`their ${agentName} had a clutch percentage of ${clutchPercentage}%`);
+            console.log(`their ${agentName} had ${assistsPR} Assists Per Round`);
+        }
+    }
 }
 
     // seasonData?.data?.segments?.forEach(segment => {
@@ -107,5 +132,4 @@ for (const season of lastSixSeasons) {
     //     console.log(`No segments found for ${seasonName}`);
     //     continue;
     // }
-    
-// https://api.tracker.gg/api/v2/valorant/standard/profile/riot/washed%20up%20player%23bored/segments/season?playlist=competitive&seasonId=ac12e9b3-47e6-9599-8fa1-0bb473e5efc7&source=web
+    // https://api.tracker.gg/api/v2/valorant/standard/profile/riot/washed%20up%20player%23bored/segments/season?playlist=competitive&seasonId=ac12e9b3-47e6-9599-8fa1-0bb473e5efc7&source=web

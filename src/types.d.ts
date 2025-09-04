@@ -91,17 +91,6 @@ interface Stat {
 
 // charlie's additions
 
-interface Stat {
-  displayName: string;
-  displayCategory: string;
-  category: string;
-  metadata: Record<string, any>;
-  value: number;
-  displayValue: string;
-  displayType: string;
-  percentile?: number;
-}
-
 interface SeasonAttributes {
   seasonId: string;
   playlist: string;
@@ -127,5 +116,33 @@ interface SeasonData {
 }
 
 interface SeasonApiResponse {
-  data: SeasonData[];
+  data: SegmentData[];
 }
+
+interface AgentAttributes {
+  key: string;       // agent UUID
+  playlist: string;
+  seasonId: string;
+}
+
+interface AgentMetadata {
+  name: string;      
+  imageUrl: string;  // agent portrait
+  role: string;
+  color: string;
+  abilities: Record<
+    string,
+    { name: string; imageUrl: string }
+  >;
+  schema: string;
+}
+
+interface AgentData {
+  type: "agent";
+  attributes: AgentAttributes;
+  metadata: AgentMetadata;
+  expiryDate: string;
+  stats: { [key: string]: Stat };
+}
+
+type SegmentData = SeasonData | AgentData;
