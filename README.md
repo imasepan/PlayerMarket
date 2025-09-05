@@ -11,3 +11,6 @@ Everything. Design a schema and identify which routes are needed to fill tables.
 ### Commands
 docker compose up -d --build // Starting
 docker compose down // Stopping
+docker run -it playermarket-playermarket bun run index.ts // for macbook, opens interactive console
+
+
