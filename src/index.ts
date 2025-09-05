@@ -89,7 +89,7 @@ async function fetchUserData(username: string) {
                 const agentEntries = seasonData.data.filter((e) => e.type === "agent");
                 agentEntries.sort(
                     (a, b) => Number(b.stats.roundsPlayed?.value ?? 0) - Number(a.stats.roundsPlayed?.value ?? 0)
-                );
+                ); // sorts agents by rounds played
             for (const agent of agentEntries) {
                     const agentName = agent.metadata.name;
                     const roundsPlayed = (agent.stats.roundsPlayed?.displayValue ?? 0);
@@ -116,7 +116,7 @@ async function fetchUserData(username: string) {
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-  });
+  }); //input data
 function inputUsername() {
   rl.question("Enter username (or type exit to exit): ", async (username) => {
     if(username.toLowerCase() === "exit") {
@@ -130,5 +130,4 @@ function inputUsername() {
 }
 
 inputUsername();
-
-    // https://api.tracker.gg/api/v2/valorant/standard/profile/riot/washed%20up%20player%23bored/segments/season?playlist=competitive&seasonId=ac12e9b3-47e6-9599-8fa1-0bb473e5efc7&source=web
+// https://api.tracker.gg/api/v2/valorant/standard/profile/riot/washed%20up%20player%23bored/segments/season?playlist=competitive&seasonId=ac12e9b3-47e6-9599-8fa1-0bb473e5efc7&source=web
