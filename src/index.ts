@@ -47,12 +47,12 @@ async function fetchUserData(username: string) {
             console.log(`No season data found for ${seasonName}`);
             continue;
         }
-
+        console.log(`\n=== ${seasonName} ===`);
         // const seasonEntry = seasonData.data[0]; // get the first season entry
         // const stats = seasonEntry.stats;
-        for (const entry of seasonData.data) {
-            if (entry.type === "season") {
-                const stats =entry.stats;
+        const seasonEntry = seasonData.data.find((e) => e.type === "season");
+            if (seasonEntry) {
+                const stats = seasonEntry.stats;
                 const totalRounds = (stats.roundsPlayed?.displayValue ?? 0);
                 const attackKillsPerRound = (stats.attackKillsPerRound?.displayValue ?? 0);
                 const defenseKillsPerRound = (stats.defenseKillsPerRound?.displayValue ?? 0);
@@ -68,7 +68,6 @@ async function fetchUserData(username: string) {
                 const KAST = (stats.kAST?.displayValue ?? 0);
                 const headshotPercentage = Number(stats.headshotsPercentage?.displayValue ?? 0);
                 const trackerScore = (stats.trnPerformanceScore?.displayValue ?? 0);
-                console.log(`\n=== ${seasonName} ===`);
                 console.log(`${platformInfo.platformUserHandle} had ${totalRounds} total rounds`);
                 console.log(`of these rounds...`)
                 console.log(`${platformInfo.platformUserHandle} had a KD of ${KDR}`);
@@ -87,64 +86,49 @@ async function fetchUserData(username: string) {
                     console.log(`${platformInfo.platformUserHandle} had an above-average headshot percentage of ${headshotPercentage}`);
                 console.log(`${platformInfo.platformUserHandle} had a tracker score of ${trackerScore}`);
                 }
-            if (entry.type === "agent") {
-                const agentName = entry.metadata.name;
-                const roundsPlayed = (entry.stats.roundsPlayed?.displayValue ?? 0);
-                const agentKPR = (entry.stats.killsPerRound?.displayValue ?? 0);
-                const agentFirstBloodsPR = (entry.stats.firstBloodsPerRound?.displayValue ?? 0);
-                const agentFirstDeathsPR = (entry.stats.firstDeathsPerRound?.displayValue ?? 0);
-                const agentKAST = (entry.stats.kAST?.displayValue ?? 0);
-                const clutchPercentage = (entry.stats.clutchesPercentage?.displayValue ?? 0);
-                const assistsPR = (entry.stats.assistsPerRound?.displayValue ?? 0);
-                console.log(`${platformInfo.platformUserHandle} played ${agentName} for ${roundsPlayed} rounds`);
-                console.log(`their ${agentName} had ${agentKPR} Kills Per Round`);
-                console.log(`their ${agentName} had ${agentFirstBloodsPR} first bloods per round`);
-                console.log(`their ${agentName} had ${agentFirstDeathsPR} first deaths per round`);
-                console.log(`their ${agentName} had a KAST of ${agentKAST}`);
-                console.log(`their ${agentName} had a clutch percentage of ${clutchPercentage}%`);
-                console.log(`their ${agentName} had ${assistsPR} Assists Per Round`);
+                const agentEntries = seasonData.data.filter((e) => e.type === "agent");
+                agentEntries.sort(
+                    (a, b) => Number(b.stats.roundsPlayed?.value ?? 0) - Number(a.stats.roundsPlayed?.value ?? 0)
+                );
+            for (const agent of agentEntries) {
+                    const agentName = agent.metadata.name;
+                    const roundsPlayed = (agent.stats.roundsPlayed?.displayValue ?? 0);
+                    const agentKPR = (agent.stats.killsPerRound?.displayValue ?? 0);
+                    const agentFirstBloodsPR = (agent.stats.firstBloodsPerRound?.displayValue ?? 0);
+                    const agentFirstDeathsPR = (agent.stats.firstDeathsPerRound?.displayValue ?? 0);
+                    const agentKAST = (agent.stats.kAST?.displayValue ?? 0);
+                    const clutchPercentage = (agent.stats.clutchesPercentage?.displayValue ?? 0);
+                    const assistsPR = (agent.stats.assistsPerRound?.displayValue ?? 0);
+                    console.log(`=== ${platformInfo.platformUserHandle} played ${agentName} for ${roundsPlayed} rounds ===`);
+                    console.log(`their ${agentName} had ${agentKPR} Kills Per Round`);
+                    console.log(`their ${agentName} had ${agentFirstBloodsPR} first bloods per round`);
+                    console.log(`their ${agentName} had ${agentFirstDeathsPR} first deaths per round`);
+                    console.log(`their ${agentName} had a KAST of ${agentKAST}`);
+                    console.log(`their ${agentName} had a clutch percentage of ${clutchPercentage}%`);
+                    console.log(`their ${agentName} had ${assistsPR} Assists Per Round`);
+
+                }
             }
-            console.log("End of Data");
+        console.log("End of Data");
         }
-    }
-}
+
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
-  
-  rl.question("Enter username: ", async (username) => {
+function inputUsername() {
+  rl.question("Enter username (or type exit to exit): ", async (username) => {
+    if(username.toLowerCase() === "exit") {
+        console.log("Exiting");
+        rl.close();
+        return;
+    }
     await fetchUserData(username);
-    rl.close();
+    inputUsername();
   });
+}
 
-    // seasonData?.data?.segments?.forEach(segment => {
-    //     if(segment.type != "season") {
-    //         return;
-    //     }
-    
-    //     const metadata = segment.metadata;
-    //     const seasonName = metadata.name;
-    //     const playlistName = metadata.playlistName;
-    
-    //     const stats = segment.stats;
-        
-    //     for (const key in stats) {
-    //         const stat = stats[key];
-    //         if (key == "attackKills") {
-    //             console.log(`${platformInfo.platformUserHandle} had ${stat.value} attack kills in season ${seasonName}`);
-    //         }
-    //         if (key == "defenseKills") {
-    //             console.log(`${platformInfo.platformUserHandle} had ${stat.value} defense kills in season ${seasonName}`);
-    //         }
-    //         if (key == "kills") {
-    //             console.log(`${platformInfo.platformUserHandle} had ${stat.value} total kills in season ${seasonName}`);
-    //         }
-    //     }
-    // })
-    // if (!seasonData?.data?.segments) {
-    //     console.log(`No segments found for ${seasonName}`);
-    //     continue;
-    // }
+inputUsername();
+
     // https://api.tracker.gg/api/v2/valorant/standard/profile/riot/washed%20up%20player%23bored/segments/season?playlist=competitive&seasonId=ac12e9b3-47e6-9599-8fa1-0bb473e5efc7&source=web
