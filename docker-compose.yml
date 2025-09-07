@@ -1,10 +1,35 @@
 services:
-  playermarket:
+  api:
     container_name : playermarket-api
     restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
+    networks:
+      - default
+    ports:
+      - "8080:8080"
     env_file:
       - .env
 
+  mongo:
+    image: mongo:7-jammy
+    container_name: playermarket-db
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    networks:
+      - default
+    ports:
+      - "27017:27017"
+    volumes:
+      - database:/data/db
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  database:
+    driver: local
