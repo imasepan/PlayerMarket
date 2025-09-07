@@ -123,6 +123,7 @@ function inputUsername() {
         console.log("Exiting");
         rl.close();
         return;
+        process.exit(1);
     }
     await fetchUserData(username);
     inputUsername();
