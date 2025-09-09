@@ -1,11 +1,12 @@
 import { getEnv } from "./utils/env";
 import { Playwright } from "./utils/playwright";
+import { spiderGraph } from "./graph";
 import readline from "readline";
 
 // TODO remove this example code and initialize an express listener
 
-console.log("hello world!");
-const username = "washed up player#bored";
+// console.log("hello world!");
+// const username = "washed up player#bored";
 // const username = "kash#psn";
 async function fetchUserData(username: string) {
     const baseApiURL = getEnv("API_URL_PROFILE") + encodeURIComponent(username);
@@ -17,7 +18,7 @@ async function fetchUserData(username: string) {
         process.exit(1);
     }   
 
-    // Process past seasons dynamically
+    // Process past 6 seasons
     const lastSixSeasons = profileData.data.metadata.seasons.slice(0, 6);
 
     for (const season of lastSixSeasons) {
@@ -31,7 +32,7 @@ async function fetchUserData(username: string) {
         // const seasonData = await Playwright.fetch<ApiResponse>(seasonUrl);
 
         // const platformInfo = profileData.data.platformInfo;
-        
+
 
         // if (!seasonData?.data?.stats) {
         //     console.log(`No season segment found for ${seasonName}`);
@@ -46,7 +47,7 @@ async function fetchUserData(username: string) {
         if (!seasonData?.data || seasonData.data.length === 0) {
             console.log(`No season data found for ${seasonName}`);
             continue;
-        }
+        } // if no data found 
         console.log(`\n=== ${seasonName} ===`);
         // const seasonEntry = seasonData.data[0]; // get the first season entry
         // const stats = seasonEntry.stats;
@@ -93,25 +94,35 @@ async function fetchUserData(username: string) {
             for (const agent of agentEntries) {
                     const agentName = agent.metadata.name;
                     const roundsPlayed = (agent.stats.roundsPlayed?.displayValue ?? 0);
-                    const agentKPR = (agent.stats.killsPerRound?.displayValue ?? 0);
-                    const agentFirstBloodsPR = (agent.stats.firstBloodsPerRound?.displayValue ?? 0);
-                    const agentFirstDeathsPR = (agent.stats.firstDeathsPerRound?.displayValue ?? 0);
-                    const agentKAST = (agent.stats.kAST?.displayValue ?? 0);
+                    const agentKDA = Number(agent.stats.kDARatio?.displayValue ?? 0);
+                    const agentKPR = Number(agent.stats.killsPerRound?.displayValue ?? 0);
+                    const agentFirstBloodsPR = Number(agent.stats.firstBloodsPerRound?.displayValue ?? 0);
+                    const agentFirstDeathsPR = Number(agent.stats.firstDeathsPerRound?.displayValue ?? 0);
+                    const agentFKFD = agentFirstDeathsPR > 0 ? agentFirstBloodsPR / agentFirstDeathsPR : 0;
+                    const agentKAST = Number((agent.stats.kAST?.value ?? 0)) / 100;
                     const clutchPercentage = (agent.stats.clutchesPercentage?.displayValue ?? 0);
-                    const assistsPR = (agent.stats.assistsPerRound?.displayValue ?? 0);
+                    const assistsPR = Number(agent.stats.assistsPerRound?.displayValue ?? 0);
+                    const playerStats = {
+                        agentKPR,
+                        agentKAST,
+                        agentKDA,
+                        agentFKFD,
+                        assistsPR,
+                    };                
                     console.log(`=== ${platformInfo.platformUserHandle} played ${agentName} for ${roundsPlayed} rounds ===`);
+                    console.log(`their ${agentName} had a K/DA of ${agentKDA}`);
                     console.log(`their ${agentName} had ${agentKPR} Kills Per Round`);
                     console.log(`their ${agentName} had ${agentFirstBloodsPR} first bloods per round`);
                     console.log(`their ${agentName} had ${agentFirstDeathsPR} first deaths per round`);
+                    console.log(`their ${agentName} had an fk/fd of ${agentFKFD}`);
                     console.log(`their ${agentName} had a KAST of ${agentKAST}`);
                     console.log(`their ${agentName} had a clutch percentage of ${clutchPercentage}%`);
                     console.log(`their ${agentName} had ${assistsPR} Assists Per Round`);
-
+                    await spiderGraph(platformInfo.platformUserHandle, agentName, playerStats, seasonName);
                 }
             }
         console.log("End of Data");
         }
-
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -122,8 +133,8 @@ function inputUsername() {
     if(username.toLowerCase() === "exit") {
         console.log("Exiting");
         rl.close();
-        return;
         process.exit(1);
+        return;
     }
     await fetchUserData(username);
     inputUsername();
