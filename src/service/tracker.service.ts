@@ -1,4 +1,5 @@
 import {PlaywrightService} from "./playwright.service.ts";
+import type {Region} from "../enums/region.ts";
 
 interface TrackerResponse<T> {
     data: T;
@@ -21,6 +22,13 @@ interface Season {
 
 interface Episode extends Season{
     seasons: Season[];
+}
+
+interface Profile {
+    platformInfo: PlatformInfo;
+    userInfo: UserInfo;
+    metadata: ProfileMetadata;
+    segments: ProfileSegment[];
 }
 
 interface PlatformInfo {
@@ -96,6 +104,23 @@ interface ProfileSegment {
     metadata: unknown;
     expiryDate: string;
     stats: unknown;
+    // ToDo
+}
+
+interface Leaderboard {
+    id: string;
+    metadata: LeaderboardMetadata;
+    items: LeaderboardItem[];
+}
+
+interface LeaderboardMetadata {
+    name: string;
+    title: string;
+    hasDistribution: boolean;
+}
+
+interface LeaderboardItem {
+ // ToDo
 }
 
 export class TrackerService {
@@ -108,11 +133,40 @@ export class TrackerService {
 
     public async getEpisodes() {
         const response = await this.playwright.fetch<TrackerResponse<Episode[]>>("");
-        return response.data;
+        return response.data.sort((a, b) => {
+            const aStart = new Date(a.startTime).getTime();
+            const bStart = new Date(b.startTime).getTime();
+            return aStart - bStart;
+        });
     }
 
     public async getSeasons() {
         const episodes = await this.getEpisodes();
-        return episodes.flatMap(episode => episode.seasons);
+        return episodes
+            .flatMap(episode => episode.seasons)
+            .sort((a, b) => {
+                const aStart = new Date(a.startTime).getTime();
+                const bStart = new Date(b.startTime).getTime();
+                return aStart - bStart;
+            });
+    }
+
+    public async getLeaderboard(region: Region, seasonId: string, take: number = 100, skip: number = 0) {
+        if (take > 100) {
+            throw new Error("Cannot take more than 100 ");
+        }
+        if (take < 0) {
+            throw new Error("Cannot take less than 0");
+        }
+        if (skip < 0) {
+            throw new Error("Cannot skip less than 0");
+        }
+        const response = await this.playwright.fetch<TrackerResponse<Leaderboard>>("");
+        return response.data;
+    }
+
+    public async getProfile(username: string) {
+        const response = await this.playwright.fetch<TrackerResponse<Profile>>("");
+        return response.data;
     }
 }
