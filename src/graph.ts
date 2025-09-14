@@ -13,6 +13,7 @@ const chart = new ChartJSNodeCanvas({
 export async function spiderGraph(
     username: string,
     agent: string,
+    rounds: string,
     stats: {
         agentKPR: number;
         agentKAST: number;
@@ -29,7 +30,7 @@ export async function spiderGraph(
           labels: ["Kills per Round", "KAST", "KDA", `FK/FD`, `APR`],
           datasets: [
             {
-              label: `${username}'s ${agent} Performance`,
+              label: `${username}'s ${agent} Performance for ${rounds}`,
               data: [
                 stats.agentKPR,
                 stats.agentKAST,
@@ -55,7 +56,7 @@ export async function spiderGraph(
                     if (label === "KDA") return `${label} (0–5)`;
                     if (label === "FK/FD") return `${label} (0–5)`;
                     if (label === "APR") return `${label} (0–5)`;
-                    if (label === "KAST") return `${label} (0–5)`;
+                    if (label === "KAST") return `${label} (0–1)`;
                 return label;
                 }
               }

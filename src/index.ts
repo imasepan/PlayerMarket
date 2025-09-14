@@ -118,7 +118,7 @@ async function fetchUserData(username: string) {
                     console.log(`their ${agentName} had a KAST of ${agentKAST}`);
                     console.log(`their ${agentName} had a clutch percentage of ${clutchPercentage}%`);
                     console.log(`their ${agentName} had ${assistsPR} Assists Per Round`);
-                    await spiderGraph(platformInfo.platformUserHandle, agentName, playerStats, seasonName);
+                    await spiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, playerStats, seasonName);
                 }
             }
         console.log("End of Data");
