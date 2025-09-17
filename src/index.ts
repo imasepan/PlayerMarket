@@ -1,6 +1,9 @@
 import { getEnv } from "./utils/env";
 import { Playwright } from "./utils/playwright";
-import { spiderGraph } from "./graph";
+import { controllerSpiderGraph } from "./graph";
+import { initiatorSpiderGraph } from "./graph";
+import { sentinelSpiderGraph } from "./graph";
+import { duelistSpiderGraph } from "./graph";
 import readline from "readline";
 
 // TODO remove this example code and initialize an express listener
@@ -96,19 +99,41 @@ async function fetchUserData(username: string) {
                     const roundsPlayed = (agent.stats.roundsPlayed?.displayValue ?? 0);
                     const agentKDA = Number(agent.stats.kDARatio?.displayValue ?? 0);
                     const agentKPR = Number(agent.stats.killsPerRound?.displayValue ?? 0);
+                    const agentDamagePerRound = Number(agent.stats.damagePerRound?.displayValue ?? 0);
                     const agentFirstBloodsPR = Number(agent.stats.firstBloodsPerRound?.displayValue ?? 0);
                     const agentFirstDeathsPR = Number(agent.stats.firstDeathsPerRound?.displayValue ?? 0);
                     const agentFKFD = agentFirstDeathsPR > 0 ? agentFirstBloodsPR / agentFirstDeathsPR : 0;
                     const agentKAST = Number((agent.stats.kAST?.value ?? 0));
                     const clutchPercentage = (agent.stats.clutchesPercentage?.displayValue ?? 0);
                     const assistsPR = Number(agent.stats.assistsPerRound?.displayValue ?? 0);
-                    const playerStats = {
+                    const controllerStats = {
+                        agentKPR,
+                        agentKAST,
+                        agentKDA,
+                        agentFirstDeathsPR,
+                        assistsPR,
+                    };
+                    const initiatorStats = {
+                        agentKPR,
+                        agentKAST,
+                        agentKDA,
+                        agentFirstDeathsPR,
+                        assistsPR,
+                    };
+                    const sentinelStats = {
                         agentKPR,
                         agentKAST,
                         agentKDA,
                         agentFKFD,
                         assistsPR,
-                    };                
+                    };
+                    const duelistStats = {
+                        agentKPR,
+                        agentKAST,
+                        agentKDA,
+                        agentFKFD,
+                        agentDamagePerRound,
+                    };            
                     console.log(`=== ${platformInfo.platformUserHandle} played ${agentName} for ${roundsPlayed} rounds ===`);
                     console.log(`their ${agentName} had a K/DA of ${agentKDA}`);
                     console.log(`their ${agentName} had ${agentKPR} Kills Per Round`);
@@ -118,7 +143,50 @@ async function fetchUserData(username: string) {
                     console.log(`their ${agentName} had a KAST of ${agentKAST}`);
                     console.log(`their ${agentName} had a clutch percentage of ${clutchPercentage}%`);
                     console.log(`their ${agentName} had ${assistsPR} Assists Per Round`);
-                    await spiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, playerStats, seasonName);
+                    if (["Omen", "Clove", "Brimstone", "Harbor", "Astra"].includes(agentName)) {
+                        await controllerSpiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, controllerStats, seasonName);
+                    }
+                    
+                    if (["Skye", "Tejo", "Sova", "Fade", "KAY/O", "Gekko", "Breach"].includes(agentName)) {
+                        await initiatorSpiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, initiatorStats, seasonName);
+                    }
+                    
+                    if (["Cypher", "Vyse", "Deadlock", "Viper", "Killjoy", "Chamber"].includes(agentName)) {
+                        await sentinelSpiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, sentinelStats, seasonName);
+                    }
+                    
+                    if (["Jett", "Raze", "Waylay", "Reyna", "Iso", "Neon", "Yoru", "Phoenix"].includes(agentName)) {
+                        await duelistSpiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, duelistStats, seasonName);
+                    }                    
+                    // // Map roles to agent names and corresponding functions
+                    // const agentRoles = [
+                    //     {
+                    //     names: ["Omen", "Clove", "Brimstone", "Harbor", "Astra"],
+                    //     fn: controllerSpiderGraph,
+                    //     stats: controllerStats,
+                    //     },
+                    //     {
+                    //     names: ["Skye", "Tejo", "Sova", "Fade", "KAY/O", "Gekko", "Breach"],
+                    //     fn: initiatorSpiderGraph,
+                    //     stats: initiatorStats,
+                    //     },
+                    //     {
+                    //     names: ["Cypher", "Vyse", "Deadlock", "Viper", "Killjoy", "Chamber"],
+                    //     fn: sentinelSpiderGraph,
+                    //     stats: sentinelStats,
+                    //     },
+                    //     {
+                    //     names: ["Jett", "Raze", "Waylay", "Reyna", "Iso", "Neon", "Yoru", "Phoenix"],
+                    //     fn: duelistSpiderGraph,
+                    //     stats: duelistStats,
+                    //     },
+                    // ];
+                    
+                    // // Find the role for the agent
+                    // const role = agentRoles.find(r => r.names.includes(agentName));
+                    // if (role) {
+                    //     await role.fn(platformInfo.platformUserHandle, agentName, roundsPlayed, role.stats, seasonName);
+                    // }
                 }
             }
         console.log("End of Data");
