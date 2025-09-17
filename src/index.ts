@@ -99,7 +99,7 @@ async function fetchUserData(username: string) {
                     const agentFirstBloodsPR = Number(agent.stats.firstBloodsPerRound?.displayValue ?? 0);
                     const agentFirstDeathsPR = Number(agent.stats.firstDeathsPerRound?.displayValue ?? 0);
                     const agentFKFD = agentFirstDeathsPR > 0 ? agentFirstBloodsPR / agentFirstDeathsPR : 0;
-                    const agentKAST = Number((agent.stats.kAST?.value ?? 0)) / 100;
+                    const agentKAST = Number((agent.stats.kAST?.value ?? 0));
                     const clutchPercentage = (agent.stats.clutchesPercentage?.displayValue ?? 0);
                     const assistsPR = Number(agent.stats.assistsPerRound?.displayValue ?? 0);
                     const playerStats = {
