@@ -124,7 +124,7 @@ async function fetchUserData(username: string) {
                         agentKPR,
                         agentKAST,
                         agentKDA,
-                        agentFKFD,
+                        agentFirstDeathsPR,
                         assistsPR,
                     };
                     const duelistStats = {
@@ -151,11 +151,11 @@ async function fetchUserData(username: string) {
                         await initiatorSpiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, initiatorStats, seasonName);
                     }
                     
-                    if (["Cypher", "Vyse", "Deadlock", "Viper", "Killjoy", "Chamber"].includes(agentName)) {
+                    if (["Cypher", "Vyse", "Deadlock", "Viper", "Killjoy"].includes(agentName)) {
                         await sentinelSpiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, sentinelStats, seasonName);
                     }
                     
-                    if (["Jett", "Raze", "Waylay", "Reyna", "Iso", "Neon", "Yoru", "Phoenix"].includes(agentName)) {
+                    if (["Jett", "Raze", "Waylay", "Reyna", "Iso", "Neon", "Yoru", "Phoenix", "Chamber"].includes(agentName)) {
                         await duelistSpiderGraph(platformInfo.platformUserHandle, agentName, roundsPlayed, duelistStats, seasonName);
                     }                    
                     // // Map roles to agent names and corresponding functions

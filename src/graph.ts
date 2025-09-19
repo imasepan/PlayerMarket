@@ -29,9 +29,9 @@ export async function controllerSpiderGraph(
 
   const indicators = [
     { name: "Kills per Round", max: 1.5 },
-    { name: "APR", max: 1.5 },
-    { name: "KDA", max: 2 },
-    { name: "FD per Round", max: 1 },
+    { name: "Assists per Round", max: 1.5 },
+    { name: "K/D/A", max: 2 },
+    { name: "First Deaths per Round", max: 1 },
     { name: "KAST", max: 100 },
   ];
 
@@ -196,8 +196,8 @@ export async function initiatorSpiderGraph(
 
   const indicators = [
     { name: "Kills per Round", max: 1.5 },
-    { name: "APR", max: 1.5 },
-    { name: "KDA", max: 2 },
+    { name: "Assists per Round", max: 1.5 },
+    { name: "K/D/A", max: 2 },
     { name: "First Deaths per Round", max: 1 },
     { name: "KAST", max: 100 },
   ];
@@ -350,7 +350,7 @@ export async function sentinelSpiderGraph(
     agentKPR: number;
     agentKAST: number;
     agentKDA: number;
-    agentFKFD: number;
+    agentFirstDeathsPR: number;
     assistsPR: number;
   },
   seasonName: string
@@ -364,9 +364,9 @@ export async function sentinelSpiderGraph(
 
   const indicators = [
     { name: "Kills per Round", max: 1.5 },
-    { name: "APR", max: 1.5 },
-    { name: "KDA", max: 2 },
-    { name: "FK/FD", max: 2.5 },
+    { name: "Assists per Round", max: 1.5 },
+    { name: "K/D/A", max: 2 },
+    { name: "First Deaths per Round", max: 1 },
     { name: "KAST", max: 100 },
   ];
 
@@ -374,7 +374,7 @@ export async function sentinelSpiderGraph(
     stats.agentKPR,
     stats.assistsPR,
     stats.agentKDA,
-    stats.agentFKFD,
+    1 - stats.agentFirstDeathsPR,
     stats.agentKAST,
   ];
 
@@ -397,9 +397,17 @@ export async function sentinelSpiderGraph(
           const currentValue = axisIndex >= 0 ? values[axisIndex] : 0;
           // const percentage = ((currentValue / indicator.max) * 100).toFixed(0);
           
+          let displayValue;
+          if (name === "First Deaths per Round") {
+          // For First Deaths per Round, show inverted scale (1.0 = best, 0.0 = worst)
+          // Convert the actual value to display value
+          displayValue = (indicator.max - currentValue).toFixed(2);
+          } else {
+          displayValue = currentValue.toFixed(2);
+          }
           return [
             `{title|${name}}`,
-            `{value|${currentValue.toFixed(2)}}`
+            `{value|${displayValue}}`
           ].join('\n');
         },
         textStyle: { 
@@ -523,10 +531,10 @@ export async function duelistSpiderGraph(
   });
 
   const indicators = [
-    { name: "Kills per Round", max: 2 },
-    { name: "Damage per Round", max: 250 },
+    { name: "Kills per Round", max: 1.5 },
+    { name: "Damage per Round", max: 200 },
     { name: "KDA", max: 2 },
-    { name: "FK/FD", max: 2.5 },
+    { name: "Entry Success Rate", max: 2.5 },
     { name: "KAST", max: 100 },
   ];
 
