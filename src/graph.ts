@@ -518,7 +518,7 @@ export async function duelistSpiderGraph(
     agentKPR: number;
     agentKAST: number;
     agentKDA: number;
-    agentFKFD: number;
+    agentEntryRate: number;
     agentDamagePerRound: number;
   },
   seasonName: string
@@ -534,15 +534,15 @@ export async function duelistSpiderGraph(
     { name: "Kills per Round", max: 1.5 },
     { name: "Damage per Round", max: 200 },
     { name: "KDA", max: 2 },
-    { name: "Entry Success Rate", max: 2.5 },
-    { name: "KAST", max: 100 },
+    { name: "Entry Success Rate (%)", max: 100 },
+    { name: "KAST (%)", max: 100 },
   ];
 
   const values = [
     stats.agentKPR,
     stats.agentDamagePerRound,
     stats.agentKDA,
-    stats.agentFKFD,
+    stats.agentEntryRate,
     stats.agentKAST,
   ];
 

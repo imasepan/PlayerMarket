@@ -100,9 +100,12 @@ async function fetchUserData(username: string) {
                     const agentKDA = Number(agent.stats.kDARatio?.displayValue ?? 0);
                     const agentKPR = Number(agent.stats.killsPerRound?.displayValue ?? 0);
                     const agentDamagePerRound = Number(agent.stats.damagePerRound?.displayValue ?? 0);
+                    const agentFirstBloods = Number(agent.stats.firstBloods?.displayValue ?? 0);
+                    const agentFirstDeaths = Number(agent.stats.firstDeaths?.displayValue ?? 0);
                     const agentFirstBloodsPR = Number(agent.stats.firstBloodsPerRound?.displayValue ?? 0);
                     const agentFirstDeathsPR = Number(agent.stats.firstDeathsPerRound?.displayValue ?? 0);
                     const agentFKFD = agentFirstDeathsPR > 0 ? agentFirstBloodsPR / agentFirstDeathsPR : 0;
+                    const agentEntryRate = agentFirstBloods > 0 ? (agentFirstBloods / (agentFirstBloods + agentFirstDeaths)) * 100 : 0;
                     const agentKAST = Number((agent.stats.kAST?.value ?? 0));
                     const clutchPercentage = (agent.stats.clutchesPercentage?.displayValue ?? 0);
                     const assistsPR = Number(agent.stats.assistsPerRound?.displayValue ?? 0);
@@ -131,7 +134,7 @@ async function fetchUserData(username: string) {
                         agentKPR,
                         agentKAST,
                         agentKDA,
-                        agentFKFD,
+                        agentEntryRate,
                         agentDamagePerRound,
                     };            
                     console.log(`=== ${platformInfo.platformUserHandle} played ${agentName} for ${roundsPlayed} rounds ===`);
