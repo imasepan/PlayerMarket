@@ -668,3 +668,114 @@ export async function duelistSpiderGraph(
 
   console.log(`Duelist Graph saved at: ${graphPath}`);
 }
+
+export async function comparisonSpiderGraph(
+  username1: string,
+  agent1: string,
+  stats1: {
+    agentKPR: number;
+    agentKAST: number;
+    agentKDA: number;
+    agentFirstDeathsPR: number;
+    assistsPR: number;
+  },
+  username2: string,
+  agent2: string,
+  stats2: {
+    agentKPR: number;
+    agentKAST: number;
+    agentKDA: number;
+    agentFirstDeathsPR: number;
+    assistsPR: number;
+  },
+  seasonName: string
+) {
+  const canvas = createCanvas(width, height);
+  const chart = echarts.init(canvas as any, null, {
+    width,
+    height,
+    renderer: "canvas",
+  });
+
+  const indicators = [
+    { name: "Kills per Round", max: 1.5 },
+    { name: "Assists per Round", max: 1.5 },
+    { name: "K/D/A", max: 2 },
+    { name: "First Deaths per Round", max: 1 },
+    { name: "KAST", max: 100 },
+  ];
+
+  const values1 = [
+    stats1.agentKPR,
+    stats1.assistsPR,
+    stats1.agentKDA,
+    1 - stats1.agentFirstDeathsPR,
+    stats1.agentKAST,
+  ];
+
+  const values2 = [
+    stats2.agentKPR,
+    stats2.assistsPR,
+    stats2.agentKDA,
+    1 - stats2.agentFirstDeathsPR,
+    stats2.agentKAST,
+  ];
+
+  const option = {
+    title: {
+      text: `${username1} (${agent1}) vs ${username2} (${agent2}) - ${seasonName}`,
+      left: "center",
+      top: 20,
+      textStyle: { fontSize: 14, color: "#333" },
+    },
+    backgroundColor: "#ffffff",
+    radar: {
+      center: ["50%", "55%"],
+      radius: "65%",
+      indicator: indicators,
+    },
+    legend: {
+      data: [`${username1} - ${agent1}`, `${username2} - ${agent2}`],
+      bottom: 0,
+    },
+    series: [
+      {
+        type: "radar",
+        data: [
+          {
+            value: values1,
+            name: `${username1} - ${agent1}`,
+            areaStyle: { color: "rgba(54, 162, 235, 0.3)" },
+            lineStyle: { color: "#36A2EB", width: 2 },
+            itemStyle: { color: "#36A2EB" },
+          },
+          {
+            value: values2,
+            name: `${username2} - ${agent2}`,
+            areaStyle: { color: "rgba(255, 99, 132, 0.3)" },
+            lineStyle: { color: "#FF6384", width: 2 },
+            itemStyle: { color: "#FF6384" },
+          },
+        ],
+      },
+    ],
+  };
+
+  chart.setOption(option, true);
+  chart.resize();
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  const graphDir = path.join(__dirname, "../graphs");
+  if (!fs.existsSync(graphDir)) fs.mkdirSync(graphDir, { recursive: true });
+
+  const safeFile = `${username1}_${agent1}_vs_${username2}_${agent2}_${seasonName}`
+    .replace(/[^a-z0-9]/gi, "_")
+    .toLowerCase();
+
+  const graphPath = path.join(graphDir, `${safeFile}.png`);
+  const buffer = canvas.toBuffer("image/png");
+  fs.writeFileSync(graphPath, buffer);
+
+  chart.dispose();
+  console.log(`Comparison Graph saved at: ${graphPath}`);
+}
