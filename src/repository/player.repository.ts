@@ -1,4 +1,4 @@
-import {type Collection, type Filter, ObjectId, type UpdateOptions} from "mongodb";
+import {type Collection, type Filter, type UpdateFilter, type UpdateOptions} from "mongodb";
 import {Player} from "../entity/player.ts";
 import {Database} from "../database.ts";
 import {PlayerNotFoundError} from "../exception/player.exception.ts";
@@ -12,16 +12,37 @@ export class PlayerRepository {
         }
     }
 
-    public async fetchById(playerId: string) {
+    public async upsert(player: Player) {
         await this.connect();
-        const query: Filter<Player> = { _id: new ObjectId(playerId) };
+        const query: Filter<Player> = { puuid: player.puuid };
+        const update: UpdateFilter<Player> = { $set: player };
+        const options: UpdateOptions = { upsert: true };
+        await this.collection?.updateOne(query, update, options);
+        return player;
+    }
+
+    public async fetchAll() {
+        await this.connect();
+        const query: Filter<Player> = {  };
+        const result = this.collection?.find(query);
+
+        if (!result) {
+            throw new PlayerNotFoundError("all");
+        }
+
+        return result.toArray();
+    }
+
+    public async fetchById(puuid: string) {
+        await this.connect();
+        const query: Filter<Player> = { puuid: puuid };
         const result = await this.collection?.findOne(query);
 
         if (!result) {
-            throw new PlayerNotFoundError(playerId);
+            throw new PlayerNotFoundError(puuid);
         }
 
-        return new Player(result._id);
+        return new Player(result.puuid, result.username);
     }
 
     public async fetchByUsername(username: string) {
@@ -33,14 +54,6 @@ export class PlayerRepository {
             throw new PlayerNotFoundError(username);
         }
 
-        return new Player(result._id);
-    }
-
-    public async upsert(player: Player) {
-        await this.connect();
-        const query: Filter<Player> = player;
-        const options: UpdateOptions = { upsert: true };
-        await this.collection?.updateOne(query, options);
-        return player;
+        return new Player(result.puuid, result.username);
     }
 }

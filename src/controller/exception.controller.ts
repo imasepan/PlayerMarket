@@ -4,6 +4,10 @@ import {ExceptionMapper} from "../mapper/exception.mapper.ts";
 export class ExceptionController {
     private exceptionMapper = new ExceptionMapper();
 
+    constructor() {
+        this.handler = this.handler.bind(this);
+    }
+
     public handler(_req: Request, res: Response, next: NextFunction) {
         try {
             next();

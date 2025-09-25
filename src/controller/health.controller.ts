@@ -4,7 +4,6 @@ export class HealthController {
     private readonly start = Date.now();
     private readonly _router: Router;
 
-
     public constructor() {
         this._router = Express.Router();
         this._router.use(Express.json());

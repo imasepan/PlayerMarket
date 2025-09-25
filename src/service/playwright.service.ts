@@ -24,8 +24,9 @@ export class PlaywrightService {
         const unlock = await PlaywrightService.mutex.lock();
 
         try {
+            console.log(apiUrl);
             const browser = await PlaywrightService.getBrowser();
-            const context = await browser.newContext(devices['Desktop Chrome']);
+            const context = await browser.newContext(devices['Desktop Chrome HiDPI']);
             const page = await context.newPage();
             const response = await page.goto(apiUrl, { waitUntil: "networkidle" });
 
@@ -45,7 +46,7 @@ export class PlaywrightService {
             await context.close();
             return data;
         } finally {
-            setTimeout(unlock, 1000);
+            setTimeout(unlock, 5000);
         }
     }
 }

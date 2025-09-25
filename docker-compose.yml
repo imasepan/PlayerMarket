@@ -22,7 +22,7 @@ services:
     networks:
       - default
     ports:
-      - "27017:27017"
+      - "27020:27017"
     volumes:
       - database:/data/db
 

@@ -1,5 +1,6 @@
 import {PlaywrightService} from "./playwright.service.ts";
 import type {Region} from "../enums/region.ts";
+import {getEnv} from "../util/env.ts";
 
 interface TrackerResponse<T> {
     data: T;
@@ -104,7 +105,6 @@ interface ProfileSegment {
     metadata: unknown;
     expiryDate: string;
     stats: unknown;
-    // ToDo
 }
 
 interface Leaderboard {
@@ -120,19 +120,93 @@ interface LeaderboardMetadata {
 }
 
 interface LeaderboardItem {
- // ToDo
+    id: string;
+    owner: LeaderboardItemOwner;
+    value: number;
+    displayValue: string;
+    rank: number;
+    percentile: unknown | null;
+    iconUrl: string | null;
 }
+
+interface LeaderboardItemOwner {
+    id: string;
+    type: string;
+    metadata: LeaderboardItemOwnerMetadata;
+    stats: LeaderboardItemOwnerStat[];
+}
+
+interface LeaderboardItemOwnerMetadata {
+    platformId: number;
+    platformSlug: string;
+    platformUserHandle: string;
+    platformUserIdentifier: string;
+    platformUserRegion: string;
+    countryCode: string;
+    pictureUrl: string;
+    avatarUrl: string;
+    customAvatarFrameInfo: unknown | null;
+    isPremium: boolean;
+    premiumDuration: unknown | null;
+    twitch: string;
+    twitter: string;
+    isLive: boolean;
+    isPrivate: boolean;
+    previousPosition: LeaderboardItemOwnerMetadataPreviousPosition;
+    topAgents: LeaderboardItemOwnerMetadataAgent[];
+}
+
+interface LeaderboardItemOwnerStat {
+    metadata: LeaderboardItemOwnerStatMetadata;
+    percentile: unknown | null;
+    rank: unknown | null;
+    displayPercentile: unknown | null;
+    displayRank: unknown | null;
+    description: unknown | null;
+    value: string;
+    displayValue: string;
+}
+
+interface LeaderboardItemOwnerStatMetadata {
+    key: string;
+    name: string;
+    description: unknown | null;
+    categoryKey: unknown | null;
+    isReversed: boolean;
+    iconUrl: string | null;
+    color: unknown | null;
+    value: unknown | null;
+    displayValue: unknown | null;
+}
+
+interface LeaderboardItemOwnerMetadataPreviousPosition {
+    rank: number;
+    value: number;
+    competitiveTier: number;
+}
+
+interface LeaderboardItemOwnerMetadataAgent {
+    name: string;
+    imageUrl: string;
+    matchesPlayed: number;
+}
+
 
 export class TrackerService {
     private readonly playwright = new PlaywrightService();
+    private apiUrl = getEnv("API_URL");
 
     public async getPlaylists() {
-        const response =  await this.playwright.fetch<TrackerResponse<Playlist[]>>("");
+        console.debug("Scrapping playlists");
+        const url = this.apiUrl + "/v1/valorant/db/playlists/";
+        const response =  await this.playwright.fetch<TrackerResponse<Playlist[]>>(url);
         return response.data;
     }
 
     public async getEpisodes() {
-        const response = await this.playwright.fetch<TrackerResponse<Episode[]>>("");
+        console.debug("Scrapping episodes");
+        const url = this.apiUrl + "/v1/valorant/db/seasons/";
+        const response = await this.playwright.fetch<TrackerResponse<Episode[]>>(url);
         return response.data.sort((a, b) => {
             const aStart = new Date(a.startTime).getTime();
             const bStart = new Date(b.startTime).getTime();
@@ -141,6 +215,7 @@ export class TrackerService {
     }
 
     public async getSeasons() {
+        console.debug("Scrapping seasons");
         const episodes = await this.getEpisodes();
         return episodes
             .flatMap(episode => episode.seasons)
@@ -151,7 +226,8 @@ export class TrackerService {
             });
     }
 
-    public async getLeaderboard(region: Region, seasonId: string, take: number = 100, skip: number = 0) {
+    public async getLeaderboard(region: Region, seasonId: string, skip: number = 0, take: number = 100, ) {
+        console.debug(`Scrapping leaderboard: region=${region}, seasonId=${seasonId} skip=${skip}, take=${take}`);
         if (take > 100) {
             throw new Error("Cannot take more than 100 ");
         }
@@ -161,12 +237,15 @@ export class TrackerService {
         if (skip < 0) {
             throw new Error("Cannot skip less than 0");
         }
-        const response = await this.playwright.fetch<TrackerResponse<Leaderboard>>("");
+        const url = this.apiUrl + `/v1/valorant/standard/leaderboards?type=ranked&platform=pc&region=${region}&act=${seasonId}&skip=${skip}&take=${take}`
+        const response = await this.playwright.fetch<TrackerResponse<Leaderboard>>(url);
         return response.data;
     }
 
     public async getProfile(username: string) {
-        const response = await this.playwright.fetch<TrackerResponse<Profile>>("");
+        console.debug(`Scrapping profile: username=${username}`);
+        const url = this.apiUrl + `/v2/valorant/standard/profile/riot/${encodeURIComponent(username)}`;
+        const response = await this.playwright.fetch<TrackerResponse<Profile>>(url);
         return response.data;
     }
 }

@@ -1,13 +1,9 @@
-import type {Document, ObjectId, WithId} from "mongodb";
+export class Player {
+    puuid: string;
+    username: string;
 
-export class Player implements WithId<Document> {
-    _id: ObjectId;
-
-    public constructor(id: ObjectId) {
-        this._id = id;
-    }
-
-    public get id() {
-        return this._id;
+    public constructor(puuid: string, username: string) {
+        this.puuid = puuid;
+        this.username = username;
     }
 }
