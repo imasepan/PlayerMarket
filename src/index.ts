@@ -6,10 +6,9 @@ import { controllerSpiderGraph } from "./graph";
 import { initiatorSpiderGraph } from "./graph";
 import { sentinelSpiderGraph } from "./graph";
 import { duelistSpiderGraph } from "./graph";
-import { comparisonSpiderGraph } from "./graph"; // uncomment when you implement this
+import { duelistComparisonSpiderGraph, sentinelComparisonSpiderGraph, initiatorComparisonSpiderGraph, controllerComparisonSpiderGraph } from "./graph"; // uncomment when you implement this
 import readline from "readline";
 
-// Pure data fetching function - NO interactive prompts
 export async function fetchUserData(username: string): Promise<any | null> {
     try {
         const baseApiURL = getEnv("API_URL_PROFILE") + encodeURIComponent(username);
@@ -20,14 +19,14 @@ export async function fetchUserData(username: string): Promise<any | null> {
             return null;
         }   
 
-        // Process past 6 seasons
+        // Process past x seasons
         const lastSixSeasons = profileData.data.metadata.seasons.slice(0, 1);
 
         for (const season of lastSixSeasons) {
             const seasonId = season.id;
             const seasonName = season.name;
 
-            // dynamically construct the season API URL
+            // dynamically constructs the season API URL
             const seasonUrl = `${baseApiURL}/segments/season?playlist=competitive&seasonId=${seasonId}&source=web`;
             console.log(`Fetching data for ${seasonName} from ${seasonUrl}`);
 
@@ -84,7 +83,6 @@ export async function fetchUserData(username: string): Promise<any | null> {
                 (a, b) => Number(b.stats.roundsPlayed?.value ?? 0) - Number(a.stats.roundsPlayed?.value ?? 0)
             );
 
-            // Create the return data structure
             const agentStats: Record<string, any> = {};
 
             for (const agent of agentEntries) {
@@ -103,7 +101,6 @@ export async function fetchUserData(username: string): Promise<any | null> {
                 const clutchPercentage = (agent.stats.clutchesPercentage?.displayValue ?? 0);
                 const assistsPR = Number(agent.stats.assistsPerRound?.displayValue ?? 0);
 
-                // Store all stats for return
                 agentStats[agentName] = {
                     agentKDA,
                     agentKPR,
@@ -202,94 +199,179 @@ function askQuestion(rl: readline.Interface, query: string): Promise<string> {
     return new Promise((resolve) => rl.question(query, resolve));
 }
 
-// Single player mode
 export async function startSinglePlayerMode(): Promise<void> {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
+        terminal: true,
     });
 
-    async function inputUsername() {
+    async function inputUsername(): Promise<boolean> {
         try {
-            const username = await askQuestion(rl, "Enter username (or type exit to exit): ");
+            console.log("");
+            const username = await askQuestion(rl, "Enter username (or type 'exit' to return to main menu): ");
+            
             if (username.toLowerCase() === "exit") {
-                console.log("Exiting");
-                rl.close();
-                return;
+                console.log("Returning to main menu...");
+                return false; // Signal to exit
             }
+            
+            if (!username.trim()) {
+                console.log("Please enter a valid username.");
+                return await inputUsername(); // Try again
+            }
+            
+            console.log(`Fetching data for: ${username}`);
             await generateSpiderGraphsForUser(username);
-            await inputUsername(); // Continue asking
+            return await inputUsername(); // Continue asking
         } catch (error) {
             console.error("Error in single player mode:", error);
-            rl.close();
+            return false; // Exit on error
         }
     }
 
+    console.log("=== Single Player Mode ===");
+    console.log("Generate spider graphs for individual players");
+    
     await inputUsername();
+    rl.close();
 }
 
-// Comparison mode
+// comparison prompts
 export async function startComparisonMode(): Promise<void> {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
+        terminal: true,
     });
 
     try {
+        console.log("=== Player Comparison Mode ===");
+        console.log("Compare two players on specific agents");
+        console.log("");
+        
         const username1 = await askQuestion(rl, "Enter first username: ");
-        const username2 = await askQuestion(rl, "Enter second username: ");
-
-        if (!username1 || !username2) {
-            console.log("Both usernames are required!");
+        if (!username1.trim()) {
+            console.log("Username cannot be empty!");
             rl.close();
             return;
         }
 
+        const username2 = await askQuestion(rl, "Enter second username: ");
+        if (!username2.trim()) {
+            console.log("Username cannot be empty!");
+            rl.close();
+            return;
+        }
+
+        console.log("");
         console.log(`Fetching data for ${username1} and ${username2}...`);
+        console.log("This may take a moment...");
 
         const player1 = await fetchUserData(username1);
         const player2 = await fetchUserData(username2);
 
         if (!player1 || !player2) {
+            console.log("");
             console.log("Could not fetch data for one or both players.");
-            console.log("Player 1 data:", !!player1);
-            console.log("Player 2 data:", !!player2);
+            console.log(`Player 1 (${username1}): ${player1 ? 'Found' : 'Not found'}`);
+            console.log(`Player 2 (${username2}): ${player2 ? 'Found' : 'Not found'}`);
             rl.close();
             return;
         }
 
+        console.log("");
         console.log("Data fetched successfully!");
-        console.log(`${player1.username} has data for agents:`, Object.keys(player1.agents));
-        console.log(`${player2.username} has data for agents:`, Object.keys(player2.agents));
+        console.log(`${player1.username} has data for agents: ${Object.keys(player1.agents).join(', ')}`);
+        console.log(`${player2.username} has data for agents: ${Object.keys(player2.agents).join(', ')}`);
+        console.log("");
 
-        const agent1 = await askQuestion(rl, `Enter agent for ${username1}: `);
-        const agent2 = await askQuestion(rl, `Enter agent for ${username2}: `);
+        const agent1 = await askQuestion(rl, `Enter agent for ${player1.username}: `);
+        const agent2 = await askQuestion(rl, `Enter agent for ${player2.username}: `);
 
         const stats1 = player1.agents[agent1];
         const stats2 = player2.agents[agent2];
 
+        // Get round counts from agent-specific data
+        const rounds1 = stats1?.roundsPlayed || "0";
+        const rounds2 = stats2?.roundsPlayed || "0";
+
         if (!stats1 || !stats2) {
+            console.log("");
             console.log("One or both selected agents not found for the players.");
-            console.log(`${agent1} found for ${player1.username}:`, !!stats1);
-            console.log(`${agent2} found for ${player2.username}:`, !!stats2);
+            console.log(`${agent1} for ${player1.username}: ${stats1 ? 'Found' : 'Not found'}`);
+            console.log(`${agent2} for ${player2.username}: ${stats2 ? 'Found' : 'Not found'}`);
             rl.close();
             return;
         }
 
-        console.log(`${player1.username}'s ${agent1} stats:`, stats1);
-        console.log(`${player2.username}'s ${agent2} stats:`, stats2);
+        console.log("");
+        console.log("Player Statistics:");
+        console.log(`${player1.username}'s ${agent1} (${rounds1} rounds):`, {
+            KPR: stats1.agentKPR,
+            KDA: stats1.agentKDA,
+            KAST: stats1.agentKAST,
+            APR: stats1.assistsPR
+        });
+        console.log(`${player2.username}'s ${agent2} (${rounds2} rounds):`, {
+            KPR: stats2.agentKPR,
+            KDA: stats2.agentKDA,
+            KAST: stats2.agentKAST,
+            APR: stats2.assistsPR
+        });
 
-        //Uncomment when you implement comparisonSpiderGraph
-        await comparisonSpiderGraph(
-            player1.username,
-            agent1,
-            stats1,
-            player2.username,
-            agent2,
-            stats2,
-            player1.seasonName || "Latest Season"
-        );
+        console.log("");
+        console.log("Generating comparison graph...");
 
+        if (["Omen", "Clove", "Brimstone", "Harbor", "Astra"].includes(agent1)) {
+            await controllerComparisonSpiderGraph(
+                player1.username,
+                agent1,
+                rounds1,
+                stats1,
+                player2.username,
+                agent2,
+                rounds2,
+                stats2,
+                player1.seasonName || "Latest Season"
+            );
+        } else if (["Skye", "Tejo", "Sova", "Fade", "KAY/O", "Gekko", "Breach"].includes(agent1)) {
+            await initiatorComparisonSpiderGraph(
+                player1.username,
+                agent1,
+                rounds1,
+                stats1,
+                player2.username,
+                agent2,
+                rounds2,
+                stats2,
+                player1.seasonName || "Latest Season"
+            );
+        } else if (["Cypher", "Vyse", "Deadlock", "Viper", "Killjoy"].includes(agent1)) {
+            await sentinelComparisonSpiderGraph(
+                player1.username,
+                agent1,
+                rounds1,
+                stats1,
+                player2.username,
+                agent2,
+                rounds2,
+                stats2,
+                player1.seasonName || "Latest Season"
+            );
+        } else if (["Jett", "Raze", "Waylay", "Reyna", "Iso", "Neon", "Yoru", "Phoenix", "Chamber"].includes(agent1)) {
+            await duelistComparisonSpiderGraph(
+                player1.username,
+                agent1,
+                rounds1,
+                stats1,
+                player2.username,
+                agent2,
+                rounds2,
+                stats2,
+                player1.seasonName || "Latest Season"
+            );
+        }
         console.log(`Comparison data prepared for ${player1.username} (${agent1}) vs ${player2.username} (${agent2})`);
         rl.close();
     } catch (error) {
@@ -300,37 +382,51 @@ export async function startComparisonMode(): Promise<void> {
 
 // Main menu
 export async function startMainMenu(): Promise<void> {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
+    while (true) {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            terminal: true,
+        });
 
-    try {
-        console.log("=== Valorant Player Analysis Tool ===");
-        console.log("1. Single Player Analysis (Generate spider graphs)");
-        console.log("2. Player Comparison");
-        console.log("3. Exit");
-        
-        const choice = await askQuestion(rl, "Select an option (1-3): ");
-        rl.close();
+        try {
+            console.log("");
+            console.log("=== Valorant Player Analysis Tool ===");
+            console.log("");
+            console.log("Choose an option:");
+            console.log("1. Single Player Analysis (Generate spider graphs)");
+            console.log("2. Player Comparison");
+            console.log("3. Exit");
+            console.log("");
+            
+            const choice = await askQuestion(rl, "Select an option (1-3): ");
+            rl.close();
 
-        switch (choice) {
-            case "1":
-                await startSinglePlayerMode();
-                break;
-            case "2":
-                await startComparisonMode();
-                break;
-            case "3":
-                console.log("Goodbye!");
-                break;
-            default:
-                console.log("Invalid choice. Please run again and select 1, 2, or 3.");
-                break;
+            console.log("");
+
+            switch (choice.trim()) {
+                case "1":
+                    console.log("Starting Single Player Mode...");
+                    await startSinglePlayerMode();
+                    console.log("\nReturning to main menu...");
+                    break;
+                case "2":
+                    console.log("Starting Comparison Mode...");
+                    await startComparisonMode();
+                    console.log("\nReturning to main menu...");
+                    break;
+                case "3":
+                    console.log("Goodbye!");
+                    process.exit(0);  // Exit
+                default:
+                    console.log("Invalid choice. Please select 1, 2, or 3.");
+                    break;
+            }
+        } catch (error) {
+            console.error("Error in main menu:", error);
+            rl.close();
+            // Continue the loop even if there's an error
         }
-    } catch (error) {
-        console.error("Error in main menu:", error);
-        rl.close();
     }
 }
 
@@ -339,13 +435,11 @@ if (import.meta.main) {
     const args = process.argv.slice(2);
     
     if (args.length === 0) {
-        // No arguments - show main menu
+        // No args = shows main menu
         startMainMenu();
     } else if (args[0] === "single" || args[0] === "s") {
-        // Single player mode
         startSinglePlayerMode();
     } else if (args[0] === "compare" || args[0] === "comp" || args[0] === "c") {
-        // Comparison mode
         startComparisonMode();
     } else if (args[0] === "help" || args[0] === "-h" || args[0] === "--help") {
         console.log("Usage:");
