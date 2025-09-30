@@ -394,7 +394,7 @@ export async function startMainMenu(): Promise<void> {
             console.log("=== Valorant Player Analysis Tool ===");
             console.log("");
             console.log("Choose an option:");
-            console.log("1. Single Player Analysis (Generate spider graphs)");
+            console.log("1. Single Player Analysis");
             console.log("2. Player Comparison");
             console.log("3. Exit");
             console.log("");

@@ -4,8 +4,8 @@ import { createCanvas, Image } from "canvas";
 import fs from "fs";
 import path from "path";
 
-const width = 600;
-const height = 600;
+const width = 1000;
+const height = 1000;
 
 export async function controllerSpiderGraph(
   username: string,
