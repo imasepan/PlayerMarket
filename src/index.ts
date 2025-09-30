@@ -213,20 +213,20 @@ export async function startSinglePlayerMode(): Promise<void> {
             
             if (username.toLowerCase() === "exit") {
                 console.log("Returning to main menu...");
-                return false; // Signal to exit
+                return false; 
             }
             
             if (!username.trim()) {
                 console.log("Please enter a valid username.");
-                return await inputUsername(); // Try again
+                return await inputUsername(); 
             }
             
             console.log(`Fetching data for: ${username}`);
             await generateSpiderGraphsForUser(username);
-            return await inputUsername(); // Continue asking
+            return await inputUsername(); 
         } catch (error) {
             console.error("Error in single player mode:", error);
-            return false; // Exit on error
+            return false; 
         }
     }
 
@@ -292,7 +292,7 @@ export async function startComparisonMode(): Promise<void> {
         const stats1 = player1.agents[agent1];
         const stats2 = player2.agents[agent2];
 
-        // Get round counts from agent-specific data
+        // round counts from agent-specific data
         const rounds1 = stats1?.roundsPlayed || "0";
         const rounds2 = stats2?.roundsPlayed || "0";
 
@@ -425,7 +425,6 @@ export async function startMainMenu(): Promise<void> {
         } catch (error) {
             console.error("Error in main menu:", error);
             rl.close();
-            // Continue the loop even if there's an error
         }
     }
 }
@@ -435,7 +434,6 @@ if (import.meta.main) {
     const args = process.argv.slice(2);
     
     if (args.length === 0) {
-        // No args = shows main menu
         startMainMenu();
     } else if (args[0] === "single" || args[0] === "s") {
         startSinglePlayerMode();
