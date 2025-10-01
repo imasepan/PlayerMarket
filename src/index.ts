@@ -8,6 +8,7 @@ import { sentinelSpiderGraph } from "./graph";
 import { duelistSpiderGraph } from "./graph";
 import { duelistComparisonSpiderGraph, sentinelComparisonSpiderGraph, initiatorComparisonSpiderGraph, controllerComparisonSpiderGraph } from "./graph"; // uncomment when you implement this
 import readline from "readline";
+import axios from "axios";
 
 export async function fetchUserData(username: string): Promise<any | null> {
     try {
@@ -139,6 +140,27 @@ export async function fetchUserData(username: string): Promise<any | null> {
         console.error(`Error fetching data for ${username}:`, error);
         return null;
     }
+}
+
+async function getAxios(): Promise<void>
+{
+    const resultsPlayers = await axios.get('https://technowizzy.dev/playermarket/api/players'); 
+    //const resultsPlayerId = await axios.get('https://technowizzy.dev/playermarket/api/players/:puuid');
+    const resultsStats = await axios.get('https://technowizzy.dev/playermarket/api/players/6dc4d5e3-5604-4717-8d2a-6e8a9d94a724/stats');
+    //const resultsSeasonId = await axios.get('https://technowizzy.dev/playermarket/api/players/:puuid/stats/:seasonId');
+
+    console.log("accessing player data from technowizzy.dev");
+    const players = resultsPlayers.data;
+    const total = players.length;
+    //const playerIDs = resultsPlayerId.data;
+    const playerStats = resultsStats.data;
+    const playerRoundsPlayed = playerStats.stats.roundsPlayed?.displayValue ?? 0;
+
+    console.log(players);
+    console.log(`Total players: ${total}`);
+    //console.log(`Player IDs: ${playerIDs}`);
+    console.log(playerStats);
+    console.log(`rounds played: ${playerRoundsPlayed}`);
 }
 
 // Function that generates spider graphs for a user
@@ -396,10 +418,11 @@ export async function startMainMenu(): Promise<void> {
             console.log("Choose an option:");
             console.log("1. Single Player Analysis");
             console.log("2. Player Comparison");
-            console.log("3. Exit");
+            console.log("3. Axios get mode");
+            console.log("4. Exit")
             console.log("");
             
-            const choice = await askQuestion(rl, "Select an option (1-3): ");
+            const choice = await askQuestion(rl, "Select an option (1-4): ");
             rl.close();
 
             console.log("");
@@ -416,10 +439,15 @@ export async function startMainMenu(): Promise<void> {
                     console.log("\nReturning to main menu...");
                     break;
                 case "3":
+                    console.log("Getting using axios...");
+                    getAxios();
+                    console.log("\nReturning to main menu...")
+                    break;
+                case "4":
                     console.log("Goodbye!");
                     process.exit(0);  // Exit
                 default:
-                    console.log("Invalid choice. Please select 1, 2, or 3.");
+                    console.log("Invalid choice. Please select 1, 2, 3,, or 4.");
                     break;
             }
         } catch (error) {
