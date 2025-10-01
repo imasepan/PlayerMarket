@@ -154,7 +154,7 @@ async function getAxios(): Promise<void>
     const total = players.length;
     //const playerIDs = resultsPlayerId.data;
     const playerStats = resultsStats.data;
-    const playerRoundsPlayed = playerStats.stats.roundsPlayed?.displayValue ?? 0;
+    const playerRoundsPlayed = playerStats[0].stats.roundsPlayed?.displayValue ?? 0;
 
     console.log(players);
     console.log(`Total players: ${total}`);
