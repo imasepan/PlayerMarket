@@ -23,6 +23,7 @@
     "chart.js": "^4.5.0",
     "chartjs-node-canvas": "^5.0.0",
     "echarts": "^6.0.0",
+    "express": "^5.1.0",
     "fs": "^0.0.1-security",
     "playwright": "^1.54.2",
     "plotly": "^1.0.6",
