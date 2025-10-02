@@ -49,7 +49,8 @@ export class PlayerGraphStatsRepository {
                 agentFirstDeathsPerRound: result.stats.firstDeathsPerRound,
                 assistsPerRound: result.stats.assistsPerRound,
                 damagePerRound: result.stats.damagePerRound,
-                firstBloodsPerRound: result.stats.firstBloodsPerRound,},
+                firstBloodsPerRound: result.stats.firstBloodsPerRound,
+            },
         };
     }
 }
