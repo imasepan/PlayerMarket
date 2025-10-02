@@ -41,7 +41,15 @@ export class PlayerGraphStatsRepository {
         return {
             puuid: result.puuid,
             seasonId: result.seasonId,
-            stats: result.stats,
+            stats: {
+                roundsPlayed: result.stats.roundsPlayed,
+                killsPerRound: result.stats.killsPerRound,
+                kAST: result.stats.kAST,
+                kDARatio: result.stats.kDARatio,
+                agentFirstDeathsPerRound: result.stats.firstDeathsPerRound,
+                assistsPerRound: result.stats.assistsPerRound,
+                damagePerRound: result.stats.damagePerRound,
+                firstBloodsPerRound: result.stats.firstBloodsPerRound,},
         };
     }
 }
