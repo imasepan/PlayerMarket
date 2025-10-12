@@ -260,6 +260,148 @@ export async function startSinglePlayerMode(): Promise<void> {
 }
 
 // comparison prompts
+// export async function startComparisonMode(): Promise<void> {
+//     const rl = readline.createInterface({
+//         input: process.stdin,
+//         output: process.stdout,
+//         terminal: true,
+//     });
+
+//     try {
+//         console.log("=== Player Comparison Mode ===");
+//         console.log("Compare two players on specific agents");
+//         console.log("");
+        
+//         const username1 = await askQuestion(rl, "Enter first username: ");
+//         if (!username1.trim()) {
+//             console.log("Username cannot be empty!");
+//             rl.close();
+//             return;
+//         }
+
+//         const username2 = await askQuestion(rl, "Enter second username: ");
+//         if (!username2.trim()) {
+//             console.log("Username cannot be empty!");
+//             rl.close();
+//             return;
+//         }
+
+//         console.log("");
+//         console.log(`Fetching data for ${username1} and ${username2}...`);
+//         console.log("This may take a moment...");
+
+//         const player1 = await fetchUserData(username1);
+//         const player2 = await fetchUserData(username2);
+
+//         if (!player1 || !player2) {
+//             console.log("");
+//             console.log("Could not fetch data for one or both players.");
+//             console.log(`Player 1 (${username1}): ${player1 ? 'Found' : 'Not found'}`);
+//             console.log(`Player 2 (${username2}): ${player2 ? 'Found' : 'Not found'}`);
+//             rl.close();
+//             return;
+//         }
+
+//         console.log("");
+//         console.log("Data fetched successfully!");
+//         console.log(`${player1.username} has data for agents: ${Object.keys(player1.agents).join(', ')}`);
+//         console.log(`${player2.username} has data for agents: ${Object.keys(player2.agents).join(', ')}`);
+//         console.log("");
+
+//         const agent1 = await askQuestion(rl, `Enter agent for ${player1.username}: `);
+//         const agent2 = await askQuestion(rl, `Enter agent for ${player2.username}: `);
+
+//         const stats1 = player1.agents[agent1];
+//         const stats2 = player2.agents[agent2];
+
+//         // round counts from agent-specific data
+//         const rounds1 = stats1?.roundsPlayed || "0";
+//         const rounds2 = stats2?.roundsPlayed || "0";
+
+//         if (!stats1 || !stats2) {
+//             console.log("");
+//             console.log("One or both selected agents not found for the players.");
+//             console.log(`${agent1} for ${player1.username}: ${stats1 ? 'Found' : 'Not found'}`);
+//             console.log(`${agent2} for ${player2.username}: ${stats2 ? 'Found' : 'Not found'}`);
+//             rl.close();
+//             return;
+//         }
+
+//         console.log("");
+//         console.log("Player Statistics:");
+//         console.log(`${player1.username}'s ${agent1} (${rounds1} rounds):`, {
+//             KPR: stats1.agentKPR,
+//             KDA: stats1.agentKDA,
+//             KAST: stats1.agentKAST,
+//             APR: stats1.assistsPR
+//         });
+//         console.log(`${player2.username}'s ${agent2} (${rounds2} rounds):`, {
+//             KPR: stats2.agentKPR,
+//             KDA: stats2.agentKDA,
+//             KAST: stats2.agentKAST,
+//             APR: stats2.assistsPR
+//         });
+
+//         console.log("");
+//         console.log("Generating comparison graph...");
+
+//         if (["Omen", "Clove", "Brimstone", "Harbor", "Astra"].includes(agent1)) {
+//             await controllerComparisonSpiderGraph(
+//                 player1.username,
+//                 agent1,
+//                 rounds1,
+//                 stats1,
+//                 player2.username,
+//                 agent2,
+//                 rounds2,
+//                 stats2,
+//                 player1.seasonName || "Latest Season"
+//             );
+//         } else if (["Skye", "Tejo", "Sova", "Fade", "KAY/O", "Gekko", "Breach"].includes(agent1)) {
+//             await initiatorComparisonSpiderGraph(
+//                 player1.username,
+//                 agent1,
+//                 rounds1,
+//                 stats1,
+//                 player2.username,
+//                 agent2,
+//                 rounds2,
+//                 stats2,
+//                 player1.seasonName || "Latest Season"
+//             );
+//         } else if (["Cypher", "Vyse", "Deadlock", "Viper", "Killjoy"].includes(agent1)) {
+//             await sentinelComparisonSpiderGraph(
+//                 player1.username,
+//                 agent1,
+//                 rounds1,
+//                 stats1,
+//                 player2.username,
+//                 agent2,
+//                 rounds2,
+//                 stats2,
+//                 player1.seasonName || "Latest Season"
+//             );
+//         } else if (["Jett", "Raze", "Waylay", "Reyna", "Iso", "Neon", "Yoru", "Phoenix", "Chamber"].includes(agent1)) {
+//             await duelistComparisonSpiderGraph(
+//                 player1.username,
+//                 agent1,
+//                 rounds1,
+//                 stats1,
+//                 player2.username,
+//                 agent2,
+//                 rounds2,
+//                 stats2,
+//                 player1.seasonName || "Latest Season"
+//             );
+//         }
+//         console.log(`Comparison data prepared for ${player1.username} (${agent1}) vs ${player2.username} (${agent2})`);
+//         rl.close();
+//     } catch (error) {
+//         console.error("Error in comparison mode:", error);
+//         rl.close();
+//     }
+// }
+
 export async function startComparisonMode(): Promise<void> {
     const rl = readline.createInterface({
         input: process.stdin,
@@ -271,7 +413,7 @@ export async function startComparisonMode(): Promise<void> {
         console.log("=== Player Comparison Mode ===");
         console.log("Compare two players on specific agents");
         console.log("");
-        
+
         const username1 = await askQuestion(rl, "Enter first username: ");
         if (!username1.trim()) {
             console.log("Username cannot be empty!");
@@ -296,111 +438,126 @@ export async function startComparisonMode(): Promise<void> {
         if (!player1 || !player2) {
             console.log("");
             console.log("Could not fetch data for one or both players.");
-            console.log(`Player 1 (${username1}): ${player1 ? 'Found' : 'Not found'}`);
-            console.log(`Player 2 (${username2}): ${player2 ? 'Found' : 'Not found'}`);
+            console.log(`Player 1 (${username1}): ${player1 ? "Found" : "Not found"}`);
+            console.log(`Player 2 (${username2}): ${player2 ? "Found" : "Not found"}`);
             rl.close();
             return;
         }
 
         console.log("");
         console.log("Data fetched successfully!");
-        console.log(`${player1.username} has data for agents: ${Object.keys(player1.agents).join(', ')}`);
-        console.log(`${player2.username} has data for agents: ${Object.keys(player2.agents).join(', ')}`);
+        console.log(`${player1.username} has data for agents: ${Object.keys(player1.agents).join(", ")}`);
+        console.log(`${player2.username} has data for agents: ${Object.keys(player2.agents).join(", ")}`);
         console.log("");
 
-        const agent1 = await askQuestion(rl, `Enter agent for ${player1.username}: `);
-        const agent2 = await askQuestion(rl, `Enter agent for ${player2.username}: `);
+        let continueComparing = true;
 
-        const stats1 = player1.agents[agent1];
-        const stats2 = player2.agents[agent2];
+        while (continueComparing) {
+            const agent1 = await askQuestion(rl, `Enter agent for ${player1.username}: `);
+            const agent2 = await askQuestion(rl, `Enter agent for ${player2.username}: `);
 
-        // round counts from agent-specific data
-        const rounds1 = stats1?.roundsPlayed || "0";
-        const rounds2 = stats2?.roundsPlayed || "0";
+            const stats1 = player1.agents[agent1];
+            const stats2 = player2.agents[agent2];
 
-        if (!stats1 || !stats2) {
+            const rounds1 = stats1?.roundsPlayed || "0";
+            const rounds2 = stats2?.roundsPlayed || "0";
+
+            if (!stats1 || !stats2) {
+                console.log("");
+                console.log("One or both selected agents not found for the players.");
+                console.log(`${agent1} for ${player1.username}: ${stats1 ? "Found" : "Not found"}`);
+                console.log(`${agent2} for ${player2.username}: ${stats2 ? "Found" : "Not found"}`);
+            } else {
+                console.log("");
+                console.log("Player Statistics:");
+                console.log(`${player1.username}'s ${agent1} (${rounds1} rounds):`, {
+                    KPR: stats1.agentKPR,
+                    KDA: stats1.agentKDA,
+                    KAST: stats1.agentKAST,
+                    APR: stats1.assistsPR
+                });
+                console.log(`${player2.username}'s ${agent2} (${rounds2} rounds):`, {
+                    KPR: stats2.agentKPR,
+                    KDA: stats2.agentKDA,
+                    KAST: stats2.agentKAST,
+                    APR: stats2.assistsPR
+                });
+
+                console.log("");
+                console.log("Generating comparison graph...");
+
+                if (["Omen", "Clove", "Brimstone", "Harbor", "Astra"].includes(agent1)) {
+                    await controllerComparisonSpiderGraph(
+                        player1.username,
+                        agent1,
+                        rounds1,
+                        stats1,
+                        player2.username,
+                        agent2,
+                        rounds2,
+                        stats2,
+                        player1.seasonName || "Latest Season"
+                    );
+                } else if (["Skye", "Tejo", "Sova", "Fade", "KAY/O", "Gekko", "Breach"].includes(agent1)) {
+                    await initiatorComparisonSpiderGraph(
+                        player1.username,
+                        agent1,
+                        rounds1,
+                        stats1,
+                        player2.username,
+                        agent2,
+                        rounds2,
+                        stats2,
+                        player1.seasonName || "Latest Season"
+                    );
+                } else if (["Cypher", "Vyse", "Deadlock", "Viper", "Killjoy"].includes(agent1)) {
+                    await sentinelComparisonSpiderGraph(
+                        player1.username,
+                        agent1,
+                        rounds1,
+                        stats1,
+                        player2.username,
+                        agent2,
+                        rounds2,
+                        stats2,
+                        player1.seasonName || "Latest Season"
+                    );
+                } else if (["Jett", "Raze", "Waylay", "Reyna", "Iso", "Neon", "Yoru", "Phoenix", "Chamber"].includes(agent1)) {
+                    await duelistComparisonSpiderGraph(
+                        player1.username,
+                        agent1,
+                        rounds1,
+                        stats1,
+                        player2.username,
+                        agent2,
+                        rounds2,
+                        stats2,
+                        player1.seasonName || "Latest Season"
+                    );
+                }
+
+                console.log(`Comparison graph generated for ${player1.username} (${agent1}) vs ${player2.username} (${agent2})`);
+            }
+
             console.log("");
-            console.log("One or both selected agents not found for the players.");
-            console.log(`${agent1} for ${player1.username}: ${stats1 ? 'Found' : 'Not found'}`);
-            console.log(`${agent2} for ${player2.username}: ${stats2 ? 'Found' : 'Not found'}`);
-            rl.close();
-            return;
+            const next = await askQuestion(rl, "Would you like to compare another set of agents? (y/n): ");
+            if (next.trim().toLowerCase() !== "y") {
+                continueComparing = false;
+                console.log("\nExiting comparison mode...");
+            }
+            else {
+                console.log(`\n${player1.username} has data for agents: ${Object.keys(player1.agents).join(", ")}`);
+                console.log(`\n${player2.username} has data for agents: ${Object.keys(player2.agents).join(", ")}`);
+            }
         }
 
-        console.log("");
-        console.log("Player Statistics:");
-        console.log(`${player1.username}'s ${agent1} (${rounds1} rounds):`, {
-            KPR: stats1.agentKPR,
-            KDA: stats1.agentKDA,
-            KAST: stats1.agentKAST,
-            APR: stats1.assistsPR
-        });
-        console.log(`${player2.username}'s ${agent2} (${rounds2} rounds):`, {
-            KPR: stats2.agentKPR,
-            KDA: stats2.agentKDA,
-            KAST: stats2.agentKAST,
-            APR: stats2.assistsPR
-        });
-
-        console.log("");
-        console.log("Generating comparison graph...");
-
-        if (["Omen", "Clove", "Brimstone", "Harbor", "Astra"].includes(agent1)) {
-            await controllerComparisonSpiderGraph(
-                player1.username,
-                agent1,
-                rounds1,
-                stats1,
-                player2.username,
-                agent2,
-                rounds2,
-                stats2,
-                player1.seasonName || "Latest Season"
-            );
-        } else if (["Skye", "Tejo", "Sova", "Fade", "KAY/O", "Gekko", "Breach"].includes(agent1)) {
-            await initiatorComparisonSpiderGraph(
-                player1.username,
-                agent1,
-                rounds1,
-                stats1,
-                player2.username,
-                agent2,
-                rounds2,
-                stats2,
-                player1.seasonName || "Latest Season"
-            );
-        } else if (["Cypher", "Vyse", "Deadlock", "Viper", "Killjoy"].includes(agent1)) {
-            await sentinelComparisonSpiderGraph(
-                player1.username,
-                agent1,
-                rounds1,
-                stats1,
-                player2.username,
-                agent2,
-                rounds2,
-                stats2,
-                player1.seasonName || "Latest Season"
-            );
-        } else if (["Jett", "Raze", "Waylay", "Reyna", "Iso", "Neon", "Yoru", "Phoenix", "Chamber"].includes(agent1)) {
-            await duelistComparisonSpiderGraph(
-                player1.username,
-                agent1,
-                rounds1,
-                stats1,
-                player2.username,
-                agent2,
-                rounds2,
-                stats2,
-                player1.seasonName || "Latest Season"
-            );
-        }
-        console.log(`Comparison data prepared for ${player1.username} (${agent1}) vs ${player2.username} (${agent2})`);
         rl.close();
     } catch (error) {
         console.error("Error in comparison mode:", error);
         rl.close();
     }
 }
+
 
 // Main menu
 export async function startMainMenu(): Promise<void> {
