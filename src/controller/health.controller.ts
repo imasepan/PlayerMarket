@@ -1,4 +1,5 @@
 import Express, {type Request, type Response, type Router} from "express";
+import {HttpStatusCode} from "axios";
 
 export class HealthController {
     private readonly start = Date.now();
@@ -16,7 +17,7 @@ export class HealthController {
 
     private health(_req: Request, res: Response) {
         const uptime = Date.now() - this.start;
-        res.json({
+        res.status(HttpStatusCode.Ok).json({
             uptime: uptime
         });
     }

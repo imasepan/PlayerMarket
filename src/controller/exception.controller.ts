@@ -8,13 +8,9 @@ export class ExceptionController {
         this.handler = this.handler.bind(this);
     }
 
-    public handler(_req: Request, res: Response, next: NextFunction) {
-        try {
-            next();
-        } catch (err) {
-            const code = this.exceptionMapper.getCode(err);
-            const message = this.exceptionMapper.getMessage(err);
-            res.status(code).send(message);
-        }
+    public handler(err: any, _req: Request, res: Response, _next: NextFunction) {
+        const code = this.exceptionMapper.getCode(err);
+        const message = this.exceptionMapper.getMessage(err);
+        res.status(code).send({ error: message });
     }
 }

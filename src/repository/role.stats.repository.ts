@@ -1,15 +1,14 @@
 import {type Collection, type Filter, type UpdateFilter, type UpdateOptions} from "mongodb";
 import {Database} from "../database.ts";
-import {PlayerNotFoundError} from "../exception/player.exception.ts";
 import {RoleStats} from "../entity/role.stats.ts";
-import {RoleStatsNotFoundException} from "../exception/role.stats.exception.ts";
+import {NotFoundError} from "../error/NotFoundError.ts";
 
 export class RoleStatsRepository {
     private collection?: Collection<RoleStats>;
 
     private async connect() {
         if (!this.collection) {
-            this.collection = await Database.getCollection<RoleStats>("player-stats");
+            this.collection = await Database.getCollection<RoleStats>("role-stats");
         }
     }
 
@@ -28,10 +27,22 @@ export class RoleStatsRepository {
         const result = this.collection?.find(query);
 
         if (!result) {
-            throw new RoleStatsNotFoundException("all");
+            throw new Error("PlayerStats result not found");
         }
 
         return result.map(a => new RoleStats(a.puuid, a.seasonId, a.role, a.stats)).toArray();
+    }
+
+    public async fetchAllById(puuid: string, seasonId: string) {
+        await this.connect();
+        const query: Filter<RoleStats> = { puuid: puuid, seasonId: seasonId};
+        const result = await this.collection?.find(query).toArray();
+
+        if (!result) {
+            throw new NotFoundError(`RoleStats with puuid ${puuid} and seasonId ${seasonId} not found`);
+        }
+
+        return result;
     }
 
     public async fetchById(puuid: string, seasonId: string, role: string) {
@@ -40,7 +51,7 @@ export class RoleStatsRepository {
         const result = await this.collection?.findOne(query);
 
         if (!result) {
-            throw new PlayerNotFoundError(puuid);
+            throw new NotFoundError(`RoleStats with id ${puuid} and seasonId ${seasonId} and role ${role} not found`);
         }
 
         return result;

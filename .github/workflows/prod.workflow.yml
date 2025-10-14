@@ -1,0 +1,34 @@
+name: Prod Deploy
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: development
+    steps:
+      # Checkout latest commit
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Load environment variables
+      - name: Load Environment Variables
+        run: |
+          touch .env
+          echo "${{ secrets.ENV }}" >> .env
+
+      # Build and run containers
+      - name: Build and Run Docker Image
+        run: |
+          make build
+          make stop
+          make run
+
+      # Clean up dangling resources
+      - name: Clean up Docker resources
+        run: |
+          docker system prune -f
+          docker builder prune -f

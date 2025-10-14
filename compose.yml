@@ -8,7 +8,7 @@ services:
     networks:
       - default
     ports:
-      - "8080:8080"
+      - "27201:8080"
     env_file:
       - .env
 
@@ -22,7 +22,7 @@ services:
     networks:
       - default
     ports:
-      - "27020:27017"
+      - "27200:27017"
     volumes:
       - database:/data/db
 

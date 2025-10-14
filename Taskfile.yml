@@ -1,0 +1,25 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - task: clean
+      - docker compose up -d --build
+      - task: logs
+    silent: true
+
+  logs:
+    cmds:
+      - docker logs -f playermarket-api
+    silent: true
+
+  clean:
+    cmds:
+      - docker compose down
+      - docker image rm playermarket-api
+    silent: true

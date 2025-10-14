@@ -1,16 +1,15 @@
-import {type Collection, type Filter, type UpdateFilter, type UpdateOptions} from "mongodb";
+import {type Collection, type Filter} from "mongodb";
 import {Database} from "../database.ts";
-import {PlayerNotFoundError} from "../exception/player.exception.ts";
 import {PlayerStats} from "../entity/player.stats.ts";
-import {PlayerStatsNotFoundException} from "../exception/player.stats.exception.ts";
+import {NotFoundError} from "../error/NotFoundError.ts";
 
-export class PlayerGraphStatsRepository {
+export class GraphRepository {
 
     private collection?: Collection<PlayerStats>;
 
     private async connect() {
         if (!this.collection) {
-            this.collection = await Database.getCollection<PlayerStats>("players");
+            this.collection = await Database.getCollection<PlayerStats>("player-stats");
         }
     }
 
@@ -35,7 +34,7 @@ export class PlayerGraphStatsRepository {
         const result = await this.collection?.findOne(query, { projection });
 
         if (!result) {
-            throw new PlayerStatsNotFoundException(`${puuid}-${seasonId}`);
+            throw new NotFoundError(`Graph Player with puuid ${puuid} in season ${seasonId} not found`);
         }
 
         return {

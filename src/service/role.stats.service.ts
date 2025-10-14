@@ -9,9 +9,14 @@ export class RoleStatsService {
         return await RoleStatsService.repository.upsert(roleStats);
     }
 
-    public async getAllPlayers() {
+    public async getAllRoleStats() {
         console.debug("Getting all role stats");
         return await RoleStatsService.repository.fetchAll();
+    }
+
+    public async getAllStatsById(puuid: string, seasonId: string) {
+        console.debug("Getting role stats by id", puuid, seasonId);
+        return await RoleStatsService.repository.fetchAllById(puuid, seasonId);
     }
 
     public async getStatsById(puuid: string, seasonId: string, role: string) {

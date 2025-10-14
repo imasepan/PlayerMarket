@@ -1,15 +1,14 @@
 import {type Collection, type Filter, type UpdateFilter, type UpdateOptions} from "mongodb";
 import {Database} from "../database.ts";
-import {PlayerNotFoundError} from "../exception/player.exception.ts";
 import {PlayerStats} from "../entity/player.stats.ts";
-import {PlayerStatsNotFoundException} from "../exception/player.stats.exception.ts";
+import {NotFoundError} from "../error/NotFoundError.ts";
 
 export class PlayerStatsRepository {
     private collection?: Collection<PlayerStats>;
 
     private async connect() {
         if (!this.collection) {
-            this.collection = await Database.getCollection<PlayerStats>("role-stats");
+            this.collection = await Database.getCollection<PlayerStats>("player-stats");
         }
     }
 
@@ -28,10 +27,22 @@ export class PlayerStatsRepository {
         const result = this.collection?.find(query);
 
         if (!result) {
-            throw new PlayerStatsNotFoundException("all");
+            throw new Error("PlayerStats result not found");
         }
 
         return result.map(a => new PlayerStats(a.puuid, a.seasonId, a.stats)).toArray();
+    }
+
+    public async fetchAllById(puuid: string) {
+        await this.connect();
+        const query: Filter<PlayerStats> = { puuid: puuid };
+        const result = await this.collection?.find(query).toArray();
+
+        if (!result) {
+            throw new NotFoundError(`PlayerStats with puuid ${puuid} not found`);
+        }
+
+        return result;
     }
 
     public async fetchById(puuid: string, seasonId: string) {
@@ -40,7 +51,7 @@ export class PlayerStatsRepository {
         const result = await this.collection?.findOne(query);
 
         if (!result) {
-            throw new PlayerNotFoundError(puuid);
+            throw new NotFoundError(`PlayerStats with id ${puuid} and seasonId ${seasonId} not found`);
         }
 
         return result;

@@ -1,7 +1,7 @@
 import {type Collection, type Filter, type UpdateFilter, type UpdateOptions} from "mongodb";
 import {Player} from "../entity/player.ts";
 import {Database} from "../database.ts";
-import {PlayerNotFoundError} from "../exception/player.exception.ts";
+import {NotFoundError} from "../error/NotFoundError.ts";
 
 export class PlayerRepository {
     private collection?: Collection<Player>;
@@ -27,7 +27,7 @@ export class PlayerRepository {
         const result = this.collection?.find(query);
 
         if (!result) {
-            throw new PlayerNotFoundError("all");
+            throw new Error("Players result not found");
         }
 
         return result.toArray();
@@ -39,7 +39,7 @@ export class PlayerRepository {
         const result = await this.collection?.findOne(query);
 
         if (!result) {
-            throw new PlayerNotFoundError(puuid);
+            throw new NotFoundError(`Player with puuid ${puuid} not found`);
         }
 
         return new Player(result.puuid, result.username);
@@ -51,7 +51,7 @@ export class PlayerRepository {
         const result = await this.collection?.findOne(query);
 
         if (!result) {
-            throw new PlayerNotFoundError(username);
+            throw new NotFoundError(`Player with username ${username} not found`);
         }
 
         return new Player(result.puuid, result.username);

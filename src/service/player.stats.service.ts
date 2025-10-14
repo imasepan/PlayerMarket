@@ -9,9 +9,9 @@ export class PlayerStatsService {
         return await PlayerStatsService.repository.upsert(playerStats);
     }
 
-    public async getAllPlayers() {
+    public async getAllStatsById(puuid: string) {
         console.debug("Getting all player stats");
-        return await PlayerStatsService.repository.fetchAll();
+        return await PlayerStatsService.repository.fetchAllById(puuid);
     }
 
     public async getStatsById(puuid: string, seasonId: string) {

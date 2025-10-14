@@ -13,6 +13,7 @@ import {PlayerStats} from "./entity/player.stats.ts";
 import {PlayerStatsService} from "./service/player.stats.service.ts";
 import {RoleStatsService} from "./service/role.stats.service.ts";
 import {RoleStats} from "./entity/role.stats.ts";
+import {GraphController} from "./controller/graph.controller.ts";
 
 export interface SeasonStats {
     matchesPlayed: StatItem;
@@ -210,9 +211,10 @@ interface AgentRoleMetadata {
 Express()
     .use(Express.json())
     .use(new RateController().handler)
-    .use(new ExceptionController().handler)
     .use("/health", new HealthController().router)
     .use("/players", new PlayerController().router)
+    .use("/graph", new GraphController().router)
+    .use(new ExceptionController().handler)
     .listen(8080);
 
 // Scraping Task
@@ -228,7 +230,7 @@ const delay = midnight.getTime() - now.getTime();
 
 console.log(delay / 1000);
 
-await parseStats();
+// await parseStats();
 
 async function parseStats() {
     const seasons = await tracker.getSeasons();
@@ -240,7 +242,7 @@ async function parseStats() {
             continue;
         }
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0;; i++) {
             const leaderboard = await tracker.getLeaderboard(Region.Global, season.id, i * 100);
             if (leaderboard.items.length == 0) {
                 console.log(`Stopped at leaderboard ${i}`);

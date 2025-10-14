@@ -1,0 +1,21 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: development
+    steps:
+      # Checkout latest commit
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Load environment variables
+      - name: Load Environment Variables
+        run: |
+          touch .env
+          echo "${{ secrets.ENV }}" >> .env
