@@ -231,8 +231,6 @@ export async function initiatorSpiderGraph(
           
           let displayValue;
           if (name === "First Deaths per Round") {
-          // For First Deaths per Round, show inverted scale (1.0 = best, 0.0 = worst)
-          // Convert the actual value to display value
           displayValue = (indicator.max - currentValue).toFixed(2);
           } else {
           displayValue = currentValue.toFixed(2);
@@ -263,7 +261,7 @@ export async function initiatorSpiderGraph(
             }
           }
         },
-        gap: 18, // Distance from the radar chart
+        gap: 18, 
       },
       indicator: indicators,
       splitArea: {
@@ -399,8 +397,6 @@ export async function sentinelSpiderGraph(
           
           let displayValue;
           if (name === "First Deaths per Round") {
-          // For First Deaths per Round, show inverted scale (1.0 = best, 0.0 = worst)
-          // Convert the actual value to display value
           displayValue = (indicator.max - currentValue).toFixed(2);
           } else {
           displayValue = currentValue.toFixed(2);
@@ -447,7 +443,6 @@ export async function sentinelSpiderGraph(
         type: "radar",
         symbol: 'circle',
         symbolSize: 6,
-        // Try putting areaStyle in multiple places to ensure it works
         areaStyle: {
           normal: {
             color: 'rgba(54, 162, 235, 0.4)'
@@ -591,7 +586,7 @@ export async function duelistSpiderGraph(
             }
           }
         },
-        gap: 18, // Distance from the radar chart
+        gap: 18, 
       },
       indicator: indicators,
       splitArea: {
@@ -607,7 +602,6 @@ export async function duelistSpiderGraph(
         type: "radar",
         symbol: 'circle',
         symbolSize: 6,
-        // Try putting areaStyle in multiple places to ensure it works
         areaStyle: {
           normal: {
             color: 'rgba(54, 162, 235, 0.4)'
